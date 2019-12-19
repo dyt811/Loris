@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# $1 is the projectname based past on from the main script.
+
 chown www-data.www-data ../modules/document_repository/user_uploads
 chown www-data.www-data ../modules/data_release/user_uploads
 chown www-data.www-data ../smarty/templates_c
@@ -21,7 +23,7 @@ CWD=`pwd`
 RootDir=`dirname $CWD`
 logdirectory=/var/log/apache2
 # Configuring Apache Configuration.
-export projectname="DeployedLORISProject"
+export projectname=$1
 
 # Need to pipe to sudo tee because > is done as the logged in user, even if run through sudo
 sed -e "s#%LORISROOT%#$RootDir#g" \

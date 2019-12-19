@@ -1,28 +1,37 @@
 version: '2'
 services:
-     mysql22:
-         image: mysql:5.7
-         container_name: LORIS22MySQLDBv1
+     MySQL22:
+         container_name: DC_LORIS22_MySQLDB_v0.1
+         image: dyt811:DC_LORIS22_MySQLDB_v0.1
          #volumes:
          #    - //c/git/data:/var/lib/mysql
-         environment:
-            MYSQL_ROOT_PASSWORD: sheep
-            MYSQL_DATABASE: l1
+         build:
+            context: ../
+            dockerfile:  DockerBuilds/Dockerfile.LORIS22.db
+            args:
+                - ARGS_MYSQL_ROOT_PASSWORD=${PlaceHolderRootPassword}
+                - ARGS_MYSQL_DATABASE=${PlaceHolderDatabase}
+                - ARGS_MYSQL_USER=${PlaceHolderUser}
+                - ARGS_MYSQL_PASSWORD=${PlaceHolderUserPassword}
+            # Environment not specified as the DockerFile is suppose to be standalone and workable too .
          ports:
-            - "3306:3306"
+            - "33306:3306"
+
+     LORIS22:
+         container_name: DC_LORIS22_v0.1
+         image: dyt811:DC_LORIS22_v0.1
+         build:
+            context: ../
+            dockerfile: DockerBuilds/Dockerfile.LORIS22.Ubuntu18
+            args:
+                - project_name=${LORISProjectName}
+         links:
+             - "MySQL22:database"
+         depends_on:
+             - MySQL22
+         ports:
+             - "8000:80"
+             - "8443:443"
+
 # To run:
 # docker-compose -f ComposeLORIS22.yml
-
-#
-#    web:
-#        build:
-#            context: ../
-#            dockerfile: DockerBuilds/Dockerfile.LORIS22.Ubuntu18
-#        volumes:
-#            - ./:/app
-#            - ./test/test_instrument:/app/project/instruments
-#        environment:
-#            - LORIS_DB_CONFIG=/app/test/config.xml
-#        depends_on:
-#            - db
-#        command: php -S 0.0.0.0:8000 -t /app/htdocs /app/htdocs/router.php

@@ -11,7 +11,7 @@ RUN useradd -m lorisadmin && echo "lorisadmin:lorisadmin" | chpasswd && adduser 
 
 USER root
 
-ARG project_name=DeployedLORISProject
+ARG project_name=TestDeployedLORISProject
 
 # install dependencies:
 RUN apt-get update && apt-get install -y mysql-client mysql-server
@@ -29,43 +29,53 @@ USER root
 WORKDIR /var/www
 RUN wget https://github.com/aces/Loris/archive/v22.0.0.zip -O release.zip
 RUN unzip release.zip
-RUN mv Loris-22.0.0 DeployedLORISProject
+RUN mv Loris-22.0.0 ${project_name}
 RUN rm release.zip
-RUN chown -R lorisadmin.lorisadmin DeployedLORISProject
+RUN chown -R lorisadmin.lorisadmin ${project_name}
 
 # Under LORISAdmin, install
 USER lorisadmin
 # Install script must run from tool directory.
-WORKDIR /var/www/DeployedLORISProject/tools
-COPY ./tools/install_lorisadmin.sh /var/www/DeployedLORISProject/tools/install_lorisadmin.sh
-COPY ./tools/install_sudo.sh /var/www/DeployedLORISProject/tools/install_sudo.sh
+WORKDIR /var/www/${project_name}/tools
+COPY ./tools/install_lorisadmin.sh /var/www/${project_name}/tools/install_lorisadmin.sh
+COPY ./tools/install_sudo.sh /var/www/${project_name}/tools/install_sudo.sh
+
+
+
+# Must ensure both of these files are set as executable by running CHMOD to update the permission.
+USER root
+RUN chmod 775 /var/www/${project_name}/tools/install_lorisadmin.sh
+RUN chmod 775 /var/www/${project_name}/tools/install_sudo.sh
+
 # Must not run as root.
-RUN /var/www/DeployedLORISProject/tools/install_lorisadmin.sh
+USER lorisadmin
+RUN /var/www/${project_name}/tools/install_lorisadmin.sh
 
 USER root
-RUN /var/www/DeployedLORISProject/tools/install_sudo.sh
+RUN /var/www/${project_name}/tools/install_sudo.sh ${project_name}
 # Must run frm /var/www/LORIS/tools folder
 # Must not exist: /var/www/LORIS/project/config.xml:
 # Must be using Bash.
 # Must not run as root.
 # PHP must be installed.
-# Make sure apache2 is not already configured for the $projectname
+# Make sure apache2 is not already configured for the ${projectname}
 
 # project name
 # lorisadmin password
 USER root
-WORKDIR /var/www/DeployedLORISProject/
+WORKDIR /var/www/${project_name}/
 RUN make
 RUN a2enmod rewrite
 #RUN a2dissite default
-RUN a2ensite DeployedLORISProject
+RUN a2ensite ${project_name}
 EXPOSE 80
 RUN service apache2 restart
 # Apache MUST be run on the foreground for it to not be stopped!
 # See https://stackoverflow.com/questions/44376852/how-to-start-apache2-automatically-in-a-ubuntu-docker-container
+
 CMD apachectl -D FOREGROUND
 # Docker Build Code (In the LORIS root dir):
-# docker build -f ./DockerBuilds/Dockerfile.LORIS22.Ubuntu18 -t dyt811:v0.3 .
+# docker build -f ./DockerBuilds/Dockerfile.LORIS22.Ubuntu18 --build-arg project_name=TestLORISProject -t dyt811:v0.7 .
 
 # Docker Run Code (This will bind the configuration interface)
-# docker run -d -it -p 8000:80 -p 8443:443 dyt811:v0.3
+# docker run -d -it -p 8000:80 -p 8443:443 dyt811:v0.7

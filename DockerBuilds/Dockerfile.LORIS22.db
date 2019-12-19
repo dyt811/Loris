@@ -1,11 +1,16 @@
 FROM mysql:5.7
 
-# These are placeholder password overwritten by the environment shortly.
-ENV MYSQL_ROOT_PASSWORD password
-ENV MYSQL_DATABASE database
-ENV MYSQL_USER root
-ENV MYSQL_PASSWORD mysql007
-ENV COMPOSE_CONVERT_WINDOWS_PATHS 1
+# Buildtime variable to overwritten by the commandline arguments shortly.
+ARG ARGS_MYSQL_ROOT_PASSWORD=PlaceHolderRootPassword
+ARG ARGS_MYSQL_DATABASE=PlaceHolderDatabase
+ARG ARGS_MYSQL_USER=PlaceHolderUser
+ARG ARGS_MYSQL_PASSWORD=PlaceHolderUserPassword
+
+#ENV COMPOSE_CONVERT_WINDOWS_PATHS 1
+ENV MYSQL_ROOT_PASSWORD ${ARGS_MYSQL_ROOT_PASSWORD}
+ENV MYSQL_DATABASE ${ARGS_MYSQL_DATABASE}
+ENV MYSQL_USER ${ARGS_MYSQL_USER}
+ENV MYSQL_PASSWORD ${ARGS_MYSQL_PASSWORD}
 
 # COPY init.sql /docker-entrypoint-initdb.d/
 # RUN chmod a+x /docker-entrypoint-initdb.d/init.sql && chown root:root     /docker-entrypoint-initdb.d/init.sql
@@ -14,6 +19,7 @@ EXPOSE 3306
 CMD ["mysqld"]
 
 # Build:
-# docker build --build-arg http_proxy=<value> --build-arg https_proxy=<value> -f Dockerfile.LORIS22.MySQLDB -t dyt811:LORIS22MySQLDB .
-# Run:
+# docker build -f ./DockerBuilds/Dockerfile.LORIS22.db --build-arg ARGS_MYSQL_ROOT_PASSWORD=PlaceHolderRootPassword1 --build-arg ARGS_MYSQL_DATABASE=PlaceHolderDatabase1 --build-arg ARGS_MYSQL_USER=PlaceHolderUser1 --build-arg ARGS_MYSQL_PASSWORD=PlaceHolderUserPassword1 -t dyt811:LORISDBv0.3 .
 
+# Run: MUST include the argument.
+# docker run -it -d  -p 33306:3306 dyt811:LORISDBv0.3
