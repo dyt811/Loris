@@ -6,3 +6,4 @@ for d in data libraries instruments templates tables_sql modules; do
     mkdir -p "${1}/${d}"
 done
 
+asdfasdf

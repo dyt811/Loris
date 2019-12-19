@@ -1,0 +1,28 @@
+version: '2'
+services:
+     mysql22:
+         image: mysql:5.7
+         container_name: LORIS22MySQLDBv1
+         #volumes:
+         #    - //c/git/data:/var/lib/mysql
+         environment:
+            MYSQL_ROOT_PASSWORD: sheep
+            MYSQL_DATABASE: l1
+         ports:
+            - "3306:3306"
+# To run:
+# docker-compose -f ComposeLORIS22.yml
+
+#
+#    web:
+#        build:
+#            context: ../
+#            dockerfile: DockerBuilds/Dockerfile.LORIS22.Ubuntu18
+#        volumes:
+#            - ./:/app
+#            - ./test/test_instrument:/app/project/instruments
+#        environment:
+#            - LORIS_DB_CONFIG=/app/test/config.xml
+#        depends_on:
+#            - db
+#        command: php -S 0.0.0.0:8000 -t /app/htdocs /app/htdocs/router.php
