@@ -2,15 +2,15 @@ FROM mysql:5.7
 
 # Buildtime variable to overwritten by the commandline arguments shortly.
 ARG ARGS_MYSQL_ROOT_PASSWORD=PlaceHolderRootPassword
-ARG ARGS_MYSQL_DATABASE=PlaceHolderDatabase
-ARG ARGS_MYSQL_USER=PlaceHolderUser
-ARG ARGS_MYSQL_PASSWORD=PlaceHolderUserPassword
+#ARG ARGS_MYSQL_DATABASE=PlaceHolderDatabase
+#ARG ARGS_MYSQL_USER=PlaceHolderUser
+#ARG ARGS_MYSQL_PASSWORD=PlaceHolderUserPassword
 
 #ENV COMPOSE_CONVERT_WINDOWS_PATHS 1
 ENV MYSQL_ROOT_PASSWORD ${ARGS_MYSQL_ROOT_PASSWORD}
-ENV MYSQL_DATABASE ${ARGS_MYSQL_DATABASE}
-ENV MYSQL_USER ${ARGS_MYSQL_USER}
-ENV MYSQL_PASSWORD ${ARGS_MYSQL_PASSWORD}
+#ENV MYSQL_DATABASE ${ARGS_MYSQL_DATABASE}
+#ENV MYSQL_USER ${ARGS_MYSQL_USER}
+#ENV MYSQL_PASSWORD ${ARGS_MYSQL_PASSWORD}
 
 # COPY init.sql /docker-entrypoint-initdb.d/
 # RUN chmod a+x /docker-entrypoint-initdb.d/init.sql && chown root:root     /docker-entrypoint-initdb.d/init.sql

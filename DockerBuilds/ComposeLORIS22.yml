@@ -1,37 +1,95 @@
-version: '2'
+version: '3.7'
 services:
+    # This is the database behind the LORIS 22 instance: note all data are stored in the dockerfile
      MySQL22:
-         container_name: DC_LORIS22_MySQLDB_v0.1
-         image: dyt811:DC_LORIS22_MySQLDB_v0.1
+         # Container name and label
+         container_name: DC_MySQLDB_${tag}
+         image: dyt811:DC_MySQLDB_${tag}
+
          #volumes:
          #    - //c/git/data:/var/lib/mysql
          build:
             context: ../
-            dockerfile:  DockerBuilds/Dockerfile.LORIS22.db
+            dockerfile:  DockerBuilds/Dockerfile.${LORIS_version}.db
+            # make sure these variables are properly named in the .env files: e.g .PlaceHolderRootPassword
             args:
-                - ARGS_MYSQL_ROOT_PASSWORD=${PlaceHolderRootPassword}
-                - ARGS_MYSQL_DATABASE=${PlaceHolderDatabase}
-                - ARGS_MYSQL_USER=${PlaceHolderUser}
-                - ARGS_MYSQL_PASSWORD=${PlaceHolderUserPassword}
+                - ARGS_MYSQL_ROOT_PASSWORD=${LorisMySQLRootPassword}
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
+         networks:
+             - backend
          ports:
-            - "33306:3306"
+            - "${Port_MySQL}:3306"
 
+    # This is the docker image of running images
      LORIS22:
-         container_name: DC_LORIS22_v0.1
-         image: dyt811:DC_LORIS22_v0.1
+         # Container name and label
+         container_name: DC_LORIS22_${tag}
+         image: dyt811:DC_LORIS22_${tag}
+
+
          build:
             context: ../
-            dockerfile: DockerBuilds/Dockerfile.LORIS22.Ubuntu18
+            dockerfile: DockerBuilds/Dockerfile.${LORIS_version}.Ubuntu18
             args:
                 - project_name=${LORISProjectName}
+         # note that this
          links:
-             - "MySQL22:database"
+             - MySQL22:${LorisMySQLHost}
+         networks:
+             - backend
          depends_on:
              - MySQL22
          ports:
-             - "8000:80"
-             - "8443:443"
+             - "${Port_LORIS_HTTP}:80"
+             - "${Port_LORIS_HTTPS}:443"
+     # This is the selenium image that will run after both LORIS22 and MySQL22 images are up to setup the Database configuraiton by simulating FRONTEND user interaction.
+
+
+     selenium-hub:
+        restart: always
+        image: selenium/hub:3.14.0
+        container_name: selenium-hub
+        ports:
+          - "4444:4444"
+        networks:
+          - backend
+
+     chrome:
+        restart: always
+        container_name: DC_LORIS22Configurator_${tag}
+        build:
+            context: ../
+            dockerfile: DockerBuilds/Dockerfile.${LORIS_version}.SeleniumPythonDBConfig
+            args:
+                - ARGS_LorisMySQLHost=${LorisMySQLHost}
+                - ARGS_LorisMySQLRoot=${LorisMySQLRoot}
+                - ARGS_LorisMySQLRootPassword=${LorisMySQLRootPassword}
+                - ARGS_LorisMySQLUser=${LorisMySQLUser}
+                - ARGS_LorisMySQLUserPassword=${LorisMySQLUserPassword}
+                - ARGS_LorisFrontendUser=${LorisFrontendUser}
+                - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
+                - ARGS_Port_LORIS_HTTP=${Port_LORIS_HTTP}
+            # Environment not specified as the DockerFile is suppose to be standalone and workable too .
+        ports:
+          - "5900-5999:5900"
+        depends_on: # all these need to be up and running before running the Selenium integrator.
+          - selenium-hub
+          - LORIS22
+          - MySQL22
+        links:
+          - selenium-hub:hub
+          # MySQL22 instance will have internal host name as:
+          - MySQL22:${LorisMySQLHost}
+          # LORIS22 will have internal host name referred as LORIS22URL
+          - LORIS22:LORIS22URL
+        networks:
+            - backend
+
+# Networks allow connection with EXTERNAL containers and PROEJCTS
+networks:
+  backend:
+    driver: "bridge"
+
 
 # To run:
-# docker-compose -f ComposeLORIS22.yml
+# docker-compose -f ComposeLORIS22.yml --force

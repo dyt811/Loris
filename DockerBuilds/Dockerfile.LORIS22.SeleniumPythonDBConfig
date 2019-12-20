@@ -1,0 +1,44 @@
+FROM selenium/standalone-chrome
+
+# First page configuraiton variables.
+
+# Set default value while let people access these externally.
+ARG ARGS_LorisMySQLHost=DefaultLorisMySQLHost
+ARG ARGS_LorisMySQLRoot=DefaultLorisMySQLRoot
+ARG ARGS_LorisMySQLRootPassword=DefaultLorisMySQLRootPassword
+# Set the env based on the value of the arguments.
+ENV LorisMySQLHost ${ARGS_LorisMySQLHost}
+ENV LorisMySQLRoot ${ARGS_LorisMySQLRoot}
+ENV LorisMySQLRootPassword ${ARGS_LorisMySQLRootPassword}
+
+# Second page configuraiton variables.
+# Set default value while let people access these externally.
+ARG ARGS_LorisMySQLUser=DefaultLorisMySQLUser
+ARG ARGS_LorisMySQLUserPassword=DefaultLorisMySQLUserPassword
+ARG ARGS_LorisFrontendUser=DefaultLorisFrontendUser
+ARG ARGS_LorisFrontendPassword=DefaultLorisFrontendPassword
+ARG ARGS_Port_LORIS_HTTP=DefaultPort_LORIS_HTTP
+# Set the env based on the value of the arguments.
+ENV LorisMySQLUser ${ARGS_LorisMySQLUser}
+ENV LorisMySQLUserPassword ${ARGS_LorisMySQLUserPassword}
+ENV LorisFrontendUser ${ARGS_LorisFrontendUser}
+ENV LorisFrontendPassword ${ARGS_LorisFrontendPassword}
+ENV Port_LORIS_HTTP=ARGS_Port_LORIS_HTTP
+# This is the selenium container that will be used to manipulate the installer to setup the LORIS via user mimicing interaction.
+FROM selenium/standalone-chrome
+COPY DockerBuilds/requirements.txt /setup/requirements.txt
+COPY DockerBuilds/LORISDBSetup.py /setup/LORISDBSetup.py
+
+# Setup
+USER root
+
+# Install pip
+RUN wget https://bootstrap.pypa.io/get-pip.py
+RUN python get-pip.py
+
+# Install requirements for selenium
+RUN python -m pip install -r /setup/requirements.txt
+
+# Setup LORIS using the script.
+CMD python /setup/LORISDBSetup.py
+
