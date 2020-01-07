@@ -1,20 +1,23 @@
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import os
+from selenium.webdriver.chrome.options import Options
 #from dotenv import load_dotenv
 
 
 PORT = os.getenv("Port_LORIS_HTTP")
 LORIS22URL = os.getenv("LORISURL")
-url_configuration =f'https://{LORIS22URL}:{PORT}/installdb.php'
+url_configuration ='http://{}:{}/installdb.php'.format(LORIS22URL, PORT)
 
-#load_dotenv()
-chrome = webdriver.Remote(
-          command_executor='http://localhost:4444/wd/hub',
-          desired_capabilities=DesiredCapabilities.CHROME)
-#firefox = webdriver.Remote(
-#          command_executor='http://localhost:4444/wd/hub',
-#          desired_capabilities=DesiredCapabilities.FIREFOX)
+chrome_options = Options()
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--window-size=1920x1080")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument('--disable-gpu')
+
+print(url_configuration)
+
+chrome = webdriver.Chrome(options=chrome_options)
 
 # Get the variable from the environment past to us from the DOCKERFILE, which received it from Compose
 
@@ -24,7 +27,7 @@ chrome.get(url_configuration)
 LorisMySQLHost = os.getenv("LorisMySQLHost")
 LorisMySQLRoot = os.getenv("LorisMySQLRoot")
 LorisMySQLRootPassword = os.getenv("LorisMySQLRootPassword")
-# Set the env based on the value of the arguments
+# Set the env based on the value of the arip and port on which hub running onguments
 LorisMySQLUser = os.getenv("LorisMySQLUser")
 LorisMySQLUserPassword = os.getenv("LorisMySQLUserPassword")
 LorisFrontendUser = os.getenv("LorisFrontendUser")
@@ -42,6 +45,7 @@ input_serverhost.send_keys(LorisMySQLRootPassword)
 
 button_submit = chrome.find_element_by_css_selector(".btn-submit")
 button_submit.click()
+print("First page configuration past")
 
 # Wait 15 seconds.
 import time
@@ -62,7 +66,9 @@ input_frontendpassword.send_keys(LorisFrontendPassword)
 
 button_submit = chrome.find_element_by_xpath("//input[@type='submit']")
 button_submit.click()
+print("Second page configuration past")
 chrome.quit()
+print("All configuration finished")
 
 """
 firefox.get('https://localhost:8080/installdb.php')
