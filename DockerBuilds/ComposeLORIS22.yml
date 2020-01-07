@@ -1,5 +1,7 @@
 version: '3.7'
+
 services:
+
     # This is the database behind the LORIS 22 instance: note all data are stored in the dockerfile
      MySQL22:
          # Container name and label
@@ -25,8 +27,6 @@ services:
          # Container name and label
          container_name: DC_LORIS22_${tag}
          image: dyt811:DC_LORIS22_${tag}
-
-
          build:
             context: ../
             dockerfile: DockerBuilds/Dockerfile.${LORIS_version}.Ubuntu18
@@ -42,9 +42,8 @@ services:
          ports:
              - "${Port_LORIS_HTTP}:80"
              - "${Port_LORIS_HTTPS}:443"
-     # This is the selenium image that will run after both LORIS22 and MySQL22 images are up to setup the Database configuraiton by simulating FRONTEND user interaction.
 
-
+     # This is the selenium HUB image (i.e. command centre) that will run after both LORIS22 and MySQL22 images are up to setup the Database configuration by simulating FRONTEND user interaction.
      selenium-hub:
         restart: always
         image: selenium/hub:3.14.0
@@ -54,6 +53,7 @@ services:
         networks:
           - backend
 
+     # This is the selenium SPOKE image (i.e. worker node) that will run the actual work process which is executed to setup the bridge connection between the database and the front end user interaction
      chrome:
         restart: always
         container_name: DC_LORIS22Configurator_${tag}
@@ -69,6 +69,7 @@ services:
                 - ARGS_LorisFrontendUser=${LorisFrontendUser}
                 - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
                 - ARGS_Port_LORIS_HTTP=${Port_LORIS_HTTP}
+                - ARGS_LORIS22="LORIS22"
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
         ports:
           - "5900-5999:5900"
@@ -78,14 +79,16 @@ services:
           - MySQL22
         links:
           - selenium-hub:hub
+
           # MySQL22 instance will have internal host name as:
           - MySQL22:${LorisMySQLHost}
+
           # LORIS22 will have internal host name referred as LORIS22URL
           - LORIS22:LORIS22URL
         networks:
             - backend
 
-# Networks allow connection with EXTERNAL containers and PROEJCTS
+# Networks allow connection with EXTERNAL containers and PROJECTS
 networks:
   backend:
     driver: "bridge"

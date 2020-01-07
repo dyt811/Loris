@@ -23,6 +23,7 @@ ENV LorisMySQLUser ${ARGS_LorisMySQLUser}
 ENV LorisMySQLUserPassword ${ARGS_LorisMySQLUserPassword}
 ENV LorisFrontendUser ${ARGS_LorisFrontendUser}
 ENV LorisFrontendPassword ${ARGS_LorisFrontendPassword}
+ENV LORISURL=ARGS_LORIS22
 ENV Port_LORIS_HTTP=ARGS_Port_LORIS_HTTP
 # This is the selenium container that will be used to manipulate the installer to setup the LORIS via user mimicing interaction.
 FROM selenium/standalone-chrome

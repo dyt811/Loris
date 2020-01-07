@@ -3,8 +3,12 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import os
 #from dotenv import load_dotenv
 
-#load_dotenv()
 
+PORT = os.getenv("Port_LORIS_HTTP")
+LORIS22URL = os.getenv("LORISURL")
+url_configuration =f'https://{LORIS22URL}:{PORT}/installdb.php'
+
+#load_dotenv()
 chrome = webdriver.Remote(
           command_executor='http://localhost:4444/wd/hub',
           desired_capabilities=DesiredCapabilities.CHROME)
@@ -12,8 +16,9 @@ chrome = webdriver.Remote(
 #          command_executor='http://localhost:4444/wd/hub',
 #          desired_capabilities=DesiredCapabilities.FIREFOX)
 
-port = os.getenv("Port_LORIS_HTTP")
-chrome.get(f'https://LORIS22URL:{port}/installdb.php')
+# Get the variable from the environment past to us from the DOCKERFILE, which received it from Compose
+
+chrome.get(url_configuration)
 
 # Load the information to fill inside
 LorisMySQLHost = os.getenv("LorisMySQLHost")
