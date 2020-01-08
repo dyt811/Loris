@@ -6,7 +6,7 @@ services:
     MySQL:
          # Container name and label
         #container_name: LORIS_MySQLDB_${tag}
-        image: dyt811:DC_LORIS_${LORIS_version}_MySQLDB_${tag}
+        image: dyt811:DC_LORIS${LORIS_version}_MySQLDB_${tag}
 
          #volumes:
          #    - //c/git/data:/var/lib/mysql

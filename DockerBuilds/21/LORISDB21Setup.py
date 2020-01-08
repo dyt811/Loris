@@ -6,17 +6,17 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
-PORT = os.getenv("Port_LORIS_HTTP")
+#PORT = os.getenv("Port_LORIS_HTTP")
 LORIS22URL = os.getenv("LORISURL")
-url_configuration ='http://{}:{}/installdb.php'.format(LORIS22URL, PORT)
+url_configuration ='http://{}:80/installdb.php'.format(LORIS22URL)
 
 print(url_configuration)
 
 # Wait 15 seconds.
 import time
-time.sleep(5)
-#chrome = webdriver.Remote("http://localhost:4444/wd/hub", DesiredCapabilities.CHROME)
-chrome = webdriver.Chrome(executable_path='/home/yang.ding/git/Loris/DockerBuilds/chromedriver')
+time.sleep(15)
+chrome = webdriver.Remote("http://hub:4444/wd/hub", DesiredCapabilities.CHROME)
+#chrome = webdriver.Chrome(executable_path='/home/yang.ding/git/Loris/DockerBuilds/chromedriver')
 
 
 # Get the variable from the environment past to us from the DOCKERFILE, which received it from Compose

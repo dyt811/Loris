@@ -22,6 +22,9 @@ services:
         ports:
             - "${Port_MySQL}:3306"
 
+        logging:
+            driver: "none"
+
     # This is the docker image of running images
     LORIS:
          # Container name and label
@@ -59,33 +62,33 @@ services:
         networks:
             - backend
 
-#
-#    selenium-driver:
-#        container_name: DC_LORIS21Configurator_${tag}
-#        build:
-#            context: ../
-#            dockerfile: DockerBuilds/Dockerfile.LORIS${LORIS_version}.SeleniumPythonDBConfig
-#            args:
-#                - ARGS_LorisMySQLHost=${LorisMySQLHost}
-#                - ARGS_LorisMySQLRoot=${LorisMySQLRoot}
-#                - ARGS_LorisMySQLRootPassword=${LorisMySQLRootPassword}
-#                - ARGS_LorisMySQLUser=${LorisMySQLUser}
-#                - ARGS_LorisMySQLUserPassword=${LorisMySQLUserPassword}
-#                - ARGS_LorisFrontendUser=${LorisFrontendUser}
-#                - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
-#                - ARGS_Port_LORIS_HTTP=${Port_LORIS_HTTP}
-#                - ARGS_LORIS21=LORIS21
-#            # Environment not specified as the DockerFile is suppose to be standalone and workable too .
-#        stdin_open: true
-#        tty: true
-#        ports:
-#          - "5900-5999:5900"
-#        depends_on: # all these need to be up and running before running the Selenium integrator.
-#          - LORIS21
-#          - MySQL21
-#          - selenium-chrome
-#        networks:
-#            - backend
+    selenium-driver:
+        container_name: DC_LORIS21Configurator_${tag}
+        build:
+            context: ../..
+            dockerfile: DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.SeleniumPythonDBConfig
+            args:
+                - ARGS_LorisMySQLHost=${LorisMySQLHost}
+                - ARGS_LorisMySQLRoot=${LorisMySQLRoot}
+                - ARGS_LorisMySQLRootPassword=${LorisMySQLRootPassword}
+                - ARGS_LorisMySQLUser=${LorisMySQLUser}
+                - ARGS_LorisMySQLUserPassword=${LorisMySQLUserPassword}
+                - ARGS_LorisFrontendUser=${LorisFrontendUser}
+                - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
+                - ARGS_Port_LORIS_HTTP=${Port_LORIS_HTTP}
+                - ARGS_LORIS21=LORIS
+            # Environment not specified as the DockerFile is suppose to be standalone and workable too .
+        stdin_open: true
+        tty: true
+        ports:
+          - "5900-5999:5900"
+        depends_on: # all these need to be up and running before running the Selenium integrator.
+          - LORIS
+          - MySQL
+          - hub
+          - chrome
+        networks:
+            - backend
 
 # Networks allow connection with EXTERNAL containers and PROJECTS
 networks:
