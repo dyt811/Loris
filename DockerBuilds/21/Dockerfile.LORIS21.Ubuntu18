@@ -1,0 +1,84 @@
+FROM ubuntu:18.04
+
+# Update APT-GET as root, install SUDO
+RUN apt-get update
+
+# create LORISAdmin user, add to sudo list;
+# Per https://stackoverflow.com/questions/25845538/how-to-use-sudo-inside-a-docker-container
+RUN useradd -m lorisadmin && echo "lorisadmin:lorisadmin" | chpasswd && adduser lorisadmin sudo
+# Creating user: This needs to be run with RUN useradd -ms
+# RUN useradd -rm -d /home/lorisadmin -s /bin/bash -g root -G sudo -u 1000 lorisadmin
+
+USER root
+
+ARG project_name=TestDeployedLORISProject
+
+# install dependencies:
+RUN apt-get update && apt-get install -y mysql-client mysql-server
+RUN apt-get install -y zip curl wget software-properties-common
+RUN apt-add-repository ppa:ondrej/php
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y apache2 tzdata
+RUN apt-get install -y php7.2 php7.2-mysql php7.2-xml php7.2-json php7.2-mbstring php7.2-gd
+RUN apt-get install -y composer libapache2-mod-php7.2 unzip nodejs npm
+RUN a2enmod php7.2
+RUN service apache2 restart
+
+# apache, MySQL, PHP, Composer, NodeJS 8, NPM, make
+USER root
+WORKDIR /var/www
+RUN wget https://github.com/aces/Loris/archive/v21.0.5.zip -O release.zip
+RUN unzip release.zip
+RUN mv Loris-21.0.5 ${project_name}
+RUN rm release.zip
+RUN chown -R lorisadmin.lorisadmin ${project_name}
+
+# Under LORISAdmin, install
+USER lorisadmin
+# Install script must run from tool directory.
+WORKDIR /var/www/${project_name}/tools
+COPY ./tools/install_lorisadmin.sh /var/www/${project_name}/tools/install_lorisadmin.sh
+COPY ./tools/install_sudo.sh /var/www/${project_name}/tools/install_sudo.sh
+
+# Patch the version 21 generaiton process in make file using verion 22 file makefile and make tool.
+COPY ./tools/gen-version.sh /var/www/${project_name}/tools/gen-version.sh
+COPY ./Makefile /var/www/${project_name}/
+
+# Must ensure both of these files are set as executable by running CHMOD to update the permission.
+USER root
+RUN chmod 775 /var/www/${project_name}/tools/gen-version.sh
+RUN chmod 775 /var/www/${project_name}/tools/install_lorisadmin.sh
+RUN chmod 775 /var/www/${project_name}/tools/install_sudo.sh
+
+# Must not run as root.
+USER lorisadmin
+RUN /var/www/${project_name}/tools/install_lorisadmin.sh
+
+USER root
+RUN /var/www/${project_name}/tools/install_sudo.sh ${project_name}
+# Must run frm /var/www/LORIS/tools folder
+# Must not exist: /var/www/LORIS/project/config.xml:
+# Must be using Bash.
+# Must not run as root.
+# PHP must be installed.
+# Make sure apache2 is not already configured for the ${projectname}
+
+# project name
+# lorisadmin password
+USER root
+WORKDIR /var/www/${project_name}/
+RUN make
+RUN a2enmod rewrite
+#RUN a2dissite default
+RUN a2ensite ${project_name}
+EXPOSE 80
+RUN service apache2 restart
+# Apache MUST be run on the foreground for it to not be stopped!
+# See https://stackoverflow.com/questions/44376852/how-to-start-apache2-automatically-in-a-ubuntu-docker-container
+
+CMD apachectl -D FOREGROUND
+# Docker Build Code (In the LORIS root dir):
+# docker build -f ./DockerBuilds/Dockerfile.LORIS22.Ubuntu18 --build-arg project_name=TestLORISProject -t dyt811:v0.7 .
+
+# Docker Run Code (This will bind the configuration interface)
+# docker run -d -it -p 8000:80 -p 8443:443 dyt811:v0.7

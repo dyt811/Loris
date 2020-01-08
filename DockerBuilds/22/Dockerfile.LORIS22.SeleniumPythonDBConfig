@@ -1,10 +1,4 @@
-FROM selenium/node-chrome:3.14.0
-
-# install Python 3.7
-RUN sudo apt-get update
-RUN sudo apt-get install -y software-properties-common
-RUN sudo add-apt-repository -y ppa:deadsnakes/ppa
-RUN sudo sudo apt-get install -y python3
+FROM python:3.7
 
 # First page configuraiton variables.
 
@@ -18,9 +12,6 @@ ENV LorisMySQLRoot ${ARGS_LorisMySQLRoot}
 ARG ARGS_LorisMySQLRootPassword=DefaultLorisMySQLRootPassword
 ENV LorisMySQLRootPassword ${ARGS_LorisMySQLRootPassword}
 # Set the env based on the value of the arguments.
-
-
-
 
 # Second page configuraiton variables.
 # Set default value while let people access these externally.
@@ -44,19 +35,12 @@ ARG ARGS_LORIS22=DefaultLORIS22
 ENV LORISURL ${ARGS_LORIS22}
 
 
-COPY DockerBuilds/requirements.txt /setup/requirements.txt
-COPY DockerBuilds/LORISDBSetup.py /setup/LORISDBSetup.py
-
-# Setup
-USER root
-
-# Install pip
-RUN wget https://bootstrap.pypa.io/get-pip.py
-RUN python3 get-pip.py
+COPY DockerBuilds/requirements.txt /setup/
+COPY DockerBuilds/LORISDB22Setup.py /setup/
 
 # Install requirements for selenium
-RUN python3 -m pip install -r /setup/requirements.txt
+RUN python -m pip install -r /setup/requirements.txt
 
 # Setup LORIS using the script.
-CMD python3 /setup/LORISDBSetup.py
+CMD python /setup/LORISDB22Setup.py
 

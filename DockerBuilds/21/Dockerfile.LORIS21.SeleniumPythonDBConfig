@@ -1,0 +1,46 @@
+FROM python:3.7
+
+# First page configuraiton variables.
+
+# Set default value while let people access these externally.
+ARG ARGS_LorisMySQLHost=DefaultLorisMySQLHost
+ENV LorisMySQLHost ${ARGS_LorisMySQLHost}
+
+ARG ARGS_LorisMySQLRoot=DefaultLorisMySQLRoot
+ENV LorisMySQLRoot ${ARGS_LorisMySQLRoot}
+
+ARG ARGS_LorisMySQLRootPassword=DefaultLorisMySQLRootPassword
+ENV LorisMySQLRootPassword ${ARGS_LorisMySQLRootPassword}
+# Set the env based on the value of the arguments.
+
+# Second page configuraiton variables.
+# Set default value while let people access these externally.
+ARG ARGS_LorisMySQLUser=DefaultLorisMySQLUser
+ENV LorisMySQLUser ${ARGS_LorisMySQLUser}
+
+ARG ARGS_LorisMySQLUserPassword=DefaultLorisMySQLUserPassword
+ENV LorisMySQLUserPassword ${ARGS_LorisMySQLUserPassword}
+
+ARG ARGS_LorisFrontendUser=DefaultLorisFrontendUser
+ENV LorisFrontendUser ${ARGS_LorisFrontendUser}
+
+ARG ARGS_LorisFrontendPassword=DefaultLorisFrontendPassword
+ENV LorisFrontendPassword ${ARGS_LorisFrontendPassword}
+
+ARG ARGS_Port_LORIS_HTTP=DefaultPort_LORIS_HTTP
+ENV Port_LORIS_HTTP ${ARGS_Port_LORIS_HTTP}
+
+# Set the env based on the value of the arguments.
+ARG ARGS_LORIS21=DefaultLORIS21
+ENV LORISURL ${ARGS_LORIS21}
+
+
+COPY DockerBuilds/requirements.txt /setup/requirements.txt
+COPY DockerBuilds/LORISDBSetup.py /setup/LORISDBSetup.py
+
+# Install requirements for selenium
+RUN python -m pip install -r /setup/requirements.txt
+
+# Setup LORIS using the script.
+CMD python /setup/LORISDBSetup.py
+

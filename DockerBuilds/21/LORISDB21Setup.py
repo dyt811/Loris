@@ -3,21 +3,21 @@ import os
 from selenium.webdriver.chrome.options import Options
 #from dotenv import load_dotenv
 
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+
 
 PORT = os.getenv("Port_LORIS_HTTP")
 LORIS22URL = os.getenv("LORISURL")
 url_configuration ='http://{}:{}/installdb.php'.format(LORIS22URL, PORT)
 
-chrome_options = Options()
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--window-size=1920x1080")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument('--disable-gpu')
-
 print(url_configuration)
 
-chrome = webdriver.Chrome(options=chrome_options)
+# Wait 15 seconds.
+import time
+time.sleep(5)
+#chrome = webdriver.Remote("http://localhost:4444/wd/hub", DesiredCapabilities.CHROME)
+chrome = webdriver.Chrome(executable_path='/home/yang.ding/git/Loris/DockerBuilds/chromedriver')
+
 
 # Get the variable from the environment past to us from the DOCKERFILE, which received it from Compose
 
@@ -69,6 +69,7 @@ button_submit.click()
 print("Second page configuration past")
 chrome.quit()
 print("All configuration finished")
+
 
 """
 firefox.get('https://localhost:8080/installdb.php')
