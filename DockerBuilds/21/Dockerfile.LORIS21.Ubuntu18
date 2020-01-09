@@ -11,10 +11,16 @@ RUN useradd -m lorisadmin && echo "lorisadmin:lorisadmin" | chpasswd && adduser 
 
 USER root
 
-ARG project_name=TestDeployedLORISProject
+ARG ARGS_ProjectName=TestDeployedLORISProject
+ARG ARGS_LorisMySQLDatabase=PlaceHolderDatabase
+ARG ARGS_LorisMySQLUser=PlaceHolderUser
+ARG ARGS_LorisMySQLUserPassword=PlaceHolderUserPassword
+ARG ARGS_LorisMySQLHost=PlaceHolderHost
+ARG ARGS_LorisMaintenanceEmail=PlaceHolderEmail
+
 
 # install dependencies:
-RUN apt-get update && apt-get install -y mysql-client mysql-server
+RUN apt-get update && apt-get install -ARGS_project_namey mysql-client mysql-server
 RUN apt-get install -y zip curl wget software-properties-common
 RUN apt-add-repository ppa:ondrej/php
 ENV DEBIAN_FRONTEND=noninteractive
@@ -29,52 +35,192 @@ USER root
 WORKDIR /var/www
 RUN wget https://github.com/aces/Loris/archive/v21.0.5.zip -O release.zip
 RUN unzip release.zip
-RUN mv Loris-21.0.5 ${project_name}
+RUN mv Loris-21.0.5 ${ARGS_ProjectName}
 RUN rm release.zip
-RUN chown -R lorisadmin.lorisadmin ${project_name}
+RUN chown -R lorisadmin.lorisadmin ${ARGS_ProjectName}
 
 # Under LORISAdmin, install
 USER lorisadmin
 # Install script must run from tool directory.
-WORKDIR /var/www/${project_name}/tools
-COPY ./tools/install_lorisadmin.sh /var/www/${project_name}/tools/install_lorisadmin.sh
-COPY ./tools/install_sudo.sh /var/www/${project_name}/tools/install_sudo.sh
+WORKDIR /var/www/${ARGS_ProjectName}/tools
+COPY ./tools/install_lorisadmin.sh /var/www/${ARGS_ProjectName}/tools/install_lorisadmin.sh
+COPY ./tools/install_sudo.sh /var/www/${ARGS_ProjectName}/tools/install_sudo.sh
 
 # Patch the version 21 generaiton process in make file using verion 22 file makefile and make tool.
-COPY ./tools/gen-version.sh /var/www/${project_name}/tools/gen-version.sh
-COPY ./Makefile /var/www/${project_name}/
+COPY ./tools/gen-version.sh /var/www/${ARGS_ProjectName}/tools/gen-version.sh
+COPY ./Makefile /var/www/${ARGS_ProjectName}/
 
 # Must ensure both of these files are set as executable by running CHMOD to update the permission.
 USER root
-RUN chmod 775 /var/www/${project_name}/tools/gen-version.sh
-RUN chmod 775 /var/www/${project_name}/tools/install_lorisadmin.sh
-RUN chmod 775 /var/www/${project_name}/tools/install_sudo.sh
+RUN chmod 775 /var/www/${ARGS_ProjectName}/tools/gen-version.sh
+RUN chmod 775 /var/www/${ARGS_ProjectName}/tools/install_lorisadmin.sh
+RUN chmod 775 /var/www/${ARGS_ProjectName}/tools/install_sudo.sh
 
 # Must not run as root.
 USER lorisadmin
-RUN /var/www/${project_name}/tools/install_lorisadmin.sh
+RUN /var/www/${ARGS_ProjectName}/tools/install_lorisadmin.sh
 
 USER root
-RUN /var/www/${project_name}/tools/install_sudo.sh ${project_name}
+RUN /var/www/${ARGS_ProjectName}/tools/install_sudo.sh ${ARGS_ProjectName}
 # Must run frm /var/www/LORIS/tools folder
 # Must not exist: /var/www/LORIS/project/config.xml:
 # Must be using Bash.
 # Must not run as root.
 # PHP must be installed.
-# Make sure apache2 is not already configured for the ${projectname}
+# Make sure apache2 is not already configured for the ${ARGS_ProjectName}
 
 # project name
 # lorisadmin password
 USER root
-WORKDIR /var/www/${project_name}/
+WORKDIR /var/www/${ARGS_ProjectName}/
 RUN make
 RUN a2enmod rewrite
 #RUN a2dissite default
-RUN a2ensite ${project_name}
+RUN a2ensite ${ARGS_ProjectName}
 EXPOSE 80
 RUN service apache2 restart
 # Apache MUST be run on the foreground for it to not be stopped!
 # See https://stackoverflow.com/questions/44376852/how-to-start-apache2-automatically-in-a-ubuntu-docker-container
+
+
+##########################
+# Install LORIS MRI Code
+##########################
+# Step 1. Create directories and download Loris-MRI code
+USER root
+# Create the /bin/mri folder .
+WORKDIR /data/${ARGS_ProjectName}/bin
+
+# Ensure permissions of the data folder is under lorisadmin.
+#RUN chown -R lorisadmin:lorisadmin /data/$ARGS_ProjectName
+ADD https://github.com/aces/Loris-MRI/archive/v21.0.5.zip /data/${ARGS_ProjectName}/bin/
+RUN unzip v21.0.5.zip
+RUN mv Loris-MRI-21.0.5 mri
+
+RUN chown -R lorisadmin:lorisadmin /data
+
+# Step 2. Install Python 3 with pip and virtualenv
+RUN apt-get install -y python3 python3-dev python3-pip libmysqlclient-dev
+RUN pip3 install virtualenv
+
+
+# Step 3. Install MINC toolkit from http://bic-mni.github.io/ into the /opt/minc/1.9.17ls folder .
+# THIS DOES NOT INSTALL DEFACING SCRIPT
+WORKDIR /opt
+ADD https://packages.bic.mni.mcgill.ca/minc-toolkit/Debian/minc-toolkit-1.9.17-20190313-Ubuntu_18.04-x86_64.deb .
+RUN apt install -f -y ./minc-toolkit-1.9.17-20190313-Ubuntu_18.04-x86_64.deb
+
+# Step 4. Run installer to set up directories, configure environment, install Perl libraries and DICOM toolkit:
+WORKDIR /data/${ARGS_ProjectName}/bin/mri/
+#bash ./imaging_install.sh
+
+# Install CPANM, must be root.
+RUN curl -L http://cpanmin.us | perl - App::cpanminus
+
+# Install perl libraries
+RUN cpanm Math::Round DBI DBD::mysql Getopt::Tabular Time::JulianDay Path::Class Archive::Extract Archive::Zip Pod::Perldoc Pod::Markdown Pod::Usage JSON Moose MooseX::Privacy TryCatch Throwable
+
+# Create VENV for python
+USER lorisadmin
+RUN mkdir -m 770 -p ./python_virtualenvs/loris-mri-python
+ENV VIRTUAL_ENV=./python_virtualenvs/loris-mri-python
+RUN python3 -m virtualenv --python=/usr/bin/python3 $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Install dependencies:
+RUN pip3 install mysqlclient mysql-connector pybids pyblake2 mne google protobuf matplotlib nose sklearn nilearn
+
+#RUN virtualenv ./python_virtualenvs/loris-mri-python -p `which python3`
+#RUN /bin/bash -c "source ./python_virtualenvs/loris-mri-python/bin/activate"
+#RUN pip3 install mysqlclient mysql-connector pybids pyblake2 mne google protobuf matplotlib nose sklearn nilearn
+#RUN /bin/bash -c "deactivate"
+
+
+
+# Create all the folders
+RUN mkdir -m 2770 -p /data/incoming
+RUN mkdir -m 2770 -p /data/${ARGS_ProjectName}/data/
+# Source: https://stackoverflow.com/questions/30359334/creating-multiple-directories-using-docker-run
+# must not have space.
+RUN mkdir -m 770 -p /data/${ARGS_ProjectName}/{trashbin,tarchive,pic,logs,assembly,batch_output,bids_imports}
+
+#holds mincs that didn't match protocol
+#holds tared dicom-folder
+#holds jpegs generated for the MRI-browser
+#holds logs from pipeline script
+#holds the MINC files
+#contains the result of the SGE (queue)
+#contains imported BIDS studies
+WORKDIR /data/${ARGS_ProjectName}/bin/mri/
+RUN mkdir -m 770 -p ./dicom-archive/.loris_mri
+
+# modify the environment script.
+RUN sed -i "s#%PROJECT%#${ARGS_ProjectName}#g" ./environment
+RUN sed -i "s#%MINC_TOOLKIT_DIR%#/opt/minc/1.9.17#g" ./environment
+#Make sure that CIVET stuff are placed in the right place
+#source /data/$PROJ/bin/$mridirname/environment
+RUN export TMPDIR=/tmp
+
+# group=www-data in Ubuntu 18.04, not www or apache
+RUN group=www-data
+
+# updating permission
+RUN chmod -R 770 ./dicom-archive/.loris_mri/
+RUN chmod -R 770 /data/${ARGS_ProjectName}/
+RUN chmod -R 770 /data/incoming/
+
+USER root
+# Making lorisadmin part of the apache group
+RUN usermod -a -G www-data lorisadmin
+
+#Setting group permissions for all files/dirs under /data/$PROJ/ and /data/incoming/
+RUN chgrp www-data -R /data/${ARGS_ProjectName}/
+RUN chgrp www-data -R /data/incoming/
+
+#Setting group ID for all files/dirs under /data/$PROJ/data
+RUN chmod -R g+s /data/${ARGS_ProjectName}/data/
+
+#Setting group ID for all files/dirs under /data/incoming
+RUN chmod -R g+s /data/incoming/
+
+# Creating prod file:
+RUN cp ./dicom-archive/profileTemplate.pl ./dicom-archive/.loris_mri/prodDataBase
+RUN chmod 640 ./dicom-archive/.loris_mri/prodDataBase
+RUN chgrp www-data ./dicom-archive/.loris_mri/prodDataBase
+
+RUN sed -e "s#DBNAME#${ARGS_LorisMySQLDatabase}#g" -e "s#DBUSER#${ARGS_LorisMySQLUser}#g" -e "s#DBPASS#$ARGS_LorisMySQLUserPassword#g" -e "s#DBHOST#$ARGS_LorisMySQLHost#g" ./dicom-archive/profileTemplate.pl > ./dicom-archive/.loris_mri/prodDataBase
+
+#Creating python database config file with database credentials"
+RUN cp ./dicom-archive/database_config_template.py ./dicom-archive/.loris_mri/database_config.py
+RUN chmod 640 ./dicom-archive/.loris_mri/database_config.py
+RUN chgrp www-data ./dicom-archive/.loris_mri/database_config.py
+RUN sed -e "s#DBNAME#${ARGS_LorisMySQLDatabase}#g" -e "s#DBUSER#${ARGS_LorisMySQLUser}#g" -e "s#DBPASS#${ARGS_LorisMySQLUserPassword}#g" -e "s#DBHOST#${ARGS_LorisMySQLHost}#g" ./dicom-archive/database_config_template.py > ./dicom-archive/.loris_mri/database_config.py
+# config file for python import scripts is located at ./dicom-archive/.loris_mri/database_config.py"
+
+RUN apt-get install -y dcmtk
+
+RUN echo "source /data/${ARGS_ProjectName}/bin/mri/environment" >> /home/lorisadmin/.bashrc
+
+ENV ENV_LorisMySQLDatabase=ARGS_LorisMySQLDatabase
+ENV ENV_LorisMySQLHost=ARGS_LorisMySQLHost
+ENV ENV_LorisMySQLUser=ARGS_LorisMySQLUser
+ENV ENV_LorisMySQLUserPassword=ARGS_LorisMySQLUserPassword
+ENV ENV_ProjectName=ARG_ProjectName
+ENV ENV_LorisMaintenanceEmail=ARGS_LorisMaintenanceEmail
+
+#"Populating database configuration entries for the Imaging Pipeline and LORIS-MRI code and images Path:"
+CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='/data/${ENV_ProjectName}/data/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='dataDirBasepath')"
+CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='${ENV_ProjectName}' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='prefix')"
+CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='${ENV_LorisMaintenanceEmail}' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='mail_user')"
+CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='/data/${ENV_ProjectName}/bin/mri/dicom-archive/get_dicom_info.pl' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='get_dicom_info')"
+CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='/data/${ENV_ProjectName}/data/tarchive/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='tarchiveLibraryDir')"
+CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='/data/${ENV_ProjectName}/bin/mri/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='MRICodePath') AND Value = '/data/${ENV_ProjectName}/bin/mri/'"
+
+
+CMD source /home/lorisadmin/.bashrc
+
+
+# Run apachecontrol in the foreground
 
 CMD apachectl -D FOREGROUND
 # Docker Build Code (In the LORIS root dir):

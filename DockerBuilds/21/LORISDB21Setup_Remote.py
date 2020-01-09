@@ -16,8 +16,6 @@ print(url_configuration)
 import time
 time.sleep(15)
 chrome = webdriver.Remote("http://hub:4444/wd/hub", DesiredCapabilities.CHROME)
-#chrome = webdriver.Chrome(executable_path='/home/yang.ding/git/Loris/DockerBuilds/chromedriver')
-
 
 # Get the variable from the environment past to us from the DOCKERFILE, which received it from Compose
 

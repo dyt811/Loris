@@ -34,7 +34,12 @@ services:
             context: ../..
             dockerfile: DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.Ubuntu18
             args:
-                - project_name=${LORISProjectName}
+                - ARGS_ProjectName=${LORISProjectName}
+                - ARGS_LorisMySQLHost=${LorisMySQLHost}
+                - ARGS_LorisMySQLUser=${LorisMySQLUser}
+                - ARGS_LorisMySQLUserPassword=${LorisMySQLUserPassword}
+                - ARGS_LorisMySQLDatabase=LORIS
+                - ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
         networks:
             - backend
         depends_on:
@@ -76,7 +81,8 @@ services:
                 - ARGS_LorisFrontendUser=${LorisFrontendUser}
                 - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
                 - ARGS_Port_LORIS_HTTP=${Port_LORIS_HTTP}
-                - ARGS_LORIS21=LORIS
+                - ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
+                - ARGS_LORIS21=LORIS # the database created by default is called LORIS
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
         stdin_open: true
         tty: true
