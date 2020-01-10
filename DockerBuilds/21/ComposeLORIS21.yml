@@ -13,7 +13,7 @@ services:
         build:
             context: ../..
             dockerfile:  DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.db
-            # make sure these variables are properly named in the .env files: e.g .PlaceHolderRootPassword
+            # make sure these variadebugbles are properly named in the .env files: e.g .PlaceHolderRootPassword
             args:
                 - ARGS_MYSQL_ROOT_PASSWORD=${LorisMySQLRootPassword}
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
@@ -58,7 +58,7 @@ services:
         environment:
           HUB_HOST: hub
         networks:
-              - backend
+          - backend
 
     hub:
         image: selenium/hub:3.14.0-gallium

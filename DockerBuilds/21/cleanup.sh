@@ -13,7 +13,7 @@ docker rm DC_LORIS21Configurator_v0.4
 
 # nuke container images
 docker rmi 21_selenium-driver:latest
-docker rmi dyt811:DC_LORIS21_v0.4
+#docker rmi dyt811:DC_LORIS21_v0.4
 
 # sanity check on results
 docker ps -a

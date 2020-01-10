@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# This needs to be run AFTER the initial database setup, which happened during the SELENIUM setup stage.
 #"Populating database configuration entries for the Imaging Pipeline and LORIS-MRI code and images Path:"
 mysql $LorisMySQLDatabase -h$LorisMySQLHost -u$LorisMySQLUser -p$LorisMySQLUserPassword -A -e "UPDATE Config SET Value='/data/$LORISProjectName/data/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='dataDirBasepath')"
 mysql $LorisMySQLDatabase -h$LorisMySQLHost -u$LorisMySQLUser -p$LorisMySQLUserPassword -A -e "UPDATE Config SET Value='$LORISProjectName' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='prefix')"

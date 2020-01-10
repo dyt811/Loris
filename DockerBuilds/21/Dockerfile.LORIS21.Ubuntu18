@@ -16,11 +16,10 @@ ARG ARGS_LorisMySQLDatabase=PlaceHolderDatabase
 ARG ARGS_LorisMySQLUser=PlaceHolderUser
 ARG ARGS_LorisMySQLUserPassword=PlaceHolderUserPassword
 ARG ARGS_LorisMySQLHost=PlaceHolderHost
-ARG ARGS_LorisMaintenanceEmail=PlaceHolderEmail
 
 
 # install dependencies:
-RUN apt-get update && apt-get install -ARGS_project_namey mysql-client mysql-server
+RUN apt-get update && apt-get install -y mysql-client mysql-server
 RUN apt-get install -y zip curl wget software-properties-common
 RUN apt-add-repository ppa:ondrej/php
 ENV DEBIAN_FRONTEND=noninteractive
@@ -200,22 +199,6 @@ RUN sed -e "s#DBNAME#${ARGS_LorisMySQLDatabase}#g" -e "s#DBUSER#${ARGS_LorisMySQ
 RUN apt-get install -y dcmtk
 
 RUN echo "source /data/${ARGS_ProjectName}/bin/mri/environment" >> /home/lorisadmin/.bashrc
-
-ENV ENV_LorisMySQLDatabase=ARGS_LorisMySQLDatabase
-ENV ENV_LorisMySQLHost=ARGS_LorisMySQLHost
-ENV ENV_LorisMySQLUser=ARGS_LorisMySQLUser
-ENV ENV_LorisMySQLUserPassword=ARGS_LorisMySQLUserPassword
-ENV ENV_ProjectName=ARG_ProjectName
-ENV ENV_LorisMaintenanceEmail=ARGS_LorisMaintenanceEmail
-
-#"Populating database configuration entries for the Imaging Pipeline and LORIS-MRI code and images Path:"
-CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='/data/${ENV_ProjectName}/data/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='dataDirBasepath')"
-CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='${ENV_ProjectName}' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='prefix')"
-CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='${ENV_LorisMaintenanceEmail}' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='mail_user')"
-CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='/data/${ENV_ProjectName}/bin/mri/dicom-archive/get_dicom_info.pl' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='get_dicom_info')"
-CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='/data/${ENV_ProjectName}/data/tarchive/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='tarchiveLibraryDir')"
-CMD mysql ${ENV_LorisMySQLDatabase} -h${ENV_LorisMySQLHost} --user=${ENV_LorisMySQLUser} --password="${ENV_LorisMySQLUserPassword}" -A -e "UPDATE Config SET Value='/data/${ENV_ProjectName}/bin/mri/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='MRICodePath') AND Value = '/data/${ENV_ProjectName}/bin/mri/'"
-
 
 CMD source /home/lorisadmin/.bashrc
 

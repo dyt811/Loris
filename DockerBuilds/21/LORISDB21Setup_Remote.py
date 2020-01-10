@@ -1,21 +1,25 @@
 from selenium import webdriver
 import os
 from selenium.webdriver.chrome.options import Options
-#from dotenv import load_dotenv
+from dotenv import load_dotenv
 
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-
+load_dotenv("./.env")
 #PORT = os.getenv("Port_LORIS_HTTP")
-LORIS22URL = os.getenv("LORISURL")
-url_configuration ='http://{}:80/installdb.php'.format(LORIS22URL)
+LORISURL = os.getenv("LORISURL")
+
+url_configuration ='http://{}:8080/installdb.php'.format(LORISURL)
+url_hub = "http://192.168.80.2:4444/wd/hub"
+
 
 print(url_configuration)
+print(url_hub)
 
 # Wait 15 seconds.
 import time
 time.sleep(15)
-chrome = webdriver.Remote("http://hub:4444/wd/hub", DesiredCapabilities.CHROME)
+chrome = webdriver.Remote(url_hub, DesiredCapabilities.CHROME)
 
 # Get the variable from the environment past to us from the DOCKERFILE, which received it from Compose
 
@@ -67,11 +71,4 @@ button_submit.click()
 print("Second page configuration past")
 chrome.quit()
 print("All configuration finished")
-
-
-"""
-firefox.get('https://localhost:8080/installdb.php')
-print(firefox.title)
-firefox.quit()
-"""
 
