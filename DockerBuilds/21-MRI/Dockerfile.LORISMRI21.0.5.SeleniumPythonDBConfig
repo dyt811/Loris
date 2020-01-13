@@ -1,0 +1,9 @@
+FROM neonatalbrainplatform/lorisdbsetup:21.0.5
+
+# Carry all the previous variable and environmental variable from the earlier Docker image.
+
+
+COPY DockerBuilds/21-MRI/Bash.LORISMRI21.0.5.sh /setup/
+
+# Install requirements for selenium
+CMD /setup/Bash.LORISMRI21.0.5.sh

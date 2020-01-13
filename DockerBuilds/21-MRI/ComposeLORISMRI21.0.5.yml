@@ -1,17 +1,22 @@
 version: '3.7'
+# This is the Docker-Compose orchestration of LORIS WITH MRI component pre-configured.
+# Last updated: 2019-01-13 12:15
+# Maintainer: Yang Ding (it@cnbp.ca)
+
 
 services:
 
     # This is the database behind the LORIS 21 instance: note all data are stored in the dockerfile
-    MySQL:
+    lorisdbmri:
          # Container name and label
         #container_name: LORIS_MySQLDB_${tag}
-        image: dyt811:DC_LORIS${LORIS_version}_MySQLDB_${tag}
+
 
          #volumes:
          #    - //c/git/data:/var/lib/mysql
         build:
             context: ../..
+            # Still using the same shared Dockerfile from the base LORIS image.
             dockerfile:  DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.db
             # make sure these variadebugbles are properly named in the .env files: e.g .PlaceHolderRootPassword
             args:
@@ -25,14 +30,16 @@ services:
         logging:
             driver: "none"
 
+        image: neonatalbrainplatform/lorismridb:{LORIS_version}
+
     # This is the docker image of running images
-    LORIS:
+    lorismri:
          # Container name and label
         #container_name: LORIS_${tag}
-        image: dyt811:DC_LORIS${LORIS_version}_${tag}
+
         build:
             context: ../..
-            dockerfile: DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.Ubuntu18
+            dockerfile: DockerBuilds/21/Dockerfile.LORISMRI${LORIS_version}.Ubuntu18
             args:
                 - ARGS_ProjectName=${LORISProjectName}
                 - ARGS_LorisMySQLHost=${LorisMySQLHost}
@@ -40,10 +47,12 @@ services:
                 - ARGS_LorisMySQLUserPassword=${LorisMySQLUserPassword}
                 - ARGS_LorisMySQLDatabase=LORIS
                 - ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
+        image: neonatalbrainplatform:lorismri:{LORIS_version}
+
         networks:
             - backend
         depends_on:
-            - MySQL
+            - lorisdb
         ports:
             - "${Port_LORIS_HTTP}:80"
             - "${Port_LORIS_HTTPS}:443"
@@ -67,11 +76,11 @@ services:
         networks:
             - backend
 
-    selenium-driver:
-        container_name: DC_LORIS21Configurator_${tag}
+    lorisdbsetup:
+        #container_name: DC_LORIS21Configurator_${tag}
         build:
             context: ../..
-            dockerfile: DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.SeleniumPythonDBConfig
+            dockerfile: DockerBuilds/21/Dockerfile.LORISMRI${LORIS_version}.SeleniumPythonDBConfig
             args:
                 - ARGS_LorisMySQLHost=${LorisMySQLHost}
                 - ARGS_LorisMySQLRoot=${LorisMySQLRoot}
@@ -102,4 +111,4 @@ networks:
     driver: "bridge"
 
 # To run:
-# docker-compose -f ComposeLORIS21.yml --force
+# docker-compose -f ComposeLORIS21.0.5.yml --force

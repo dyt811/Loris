@@ -33,3 +33,7 @@ VERSION
 .DS_Store
 .env
 /venv/
+
+DockerBuilds/chromedriver
+
+package-lock.json
