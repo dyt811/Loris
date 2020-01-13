@@ -1,8 +1,10 @@
 from selenium import webdriver
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+#load_dotenv(Path("21-MRI/.env")) # 21.0.5 Config
+load_dotenv(Path("21-MRI/.env")) # 21.0.5-MRI Config
 
 url_configuration ='http://localhost:8080/installdb.php'
 
