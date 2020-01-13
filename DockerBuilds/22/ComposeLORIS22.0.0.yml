@@ -93,4 +93,4 @@ networks:
     driver: "bridge"
 
 # To run:
-# docker-compose -f ComposeLORIS22.yml --force
+# docker-compose -f ComposeLORIS22.0.0.yml --force

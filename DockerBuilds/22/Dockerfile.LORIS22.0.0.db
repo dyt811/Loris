@@ -19,7 +19,7 @@ EXPOSE 3306
 CMD ["mysqld"]
 
 # Build:
-# docker build -f ./DockerBuilds/Dockerfile.LORIS22.db --build-arg ARGS_MYSQL_ROOT_PASSWORD=PlaceHolderRootPassword1 --build-arg ARGS_MYSQL_DATABASE=PlaceHolderDatabase1 --build-arg ARGS_MYSQL_USER=PlaceHolderUser1 --build-arg ARGS_MYSQL_PASSWORD=PlaceHolderUserPassword1 -t dyt811:LORISDBv0.3 .
+# docker build -f ./DockerBuilds/Dockerfile.LORIS22.0.0.db --build-arg ARGS_MYSQL_ROOT_PASSWORD=PlaceHolderRootPassword1 --build-arg ARGS_MYSQL_DATABASE=PlaceHolderDatabase1 --build-arg ARGS_MYSQL_USER=PlaceHolderUser1 --build-arg ARGS_MYSQL_PASSWORD=PlaceHolderUserPassword1 -t dyt811:LORISDBv0.3 .
 
 # Run: MUST include the argument.
 # docker run -it -d  -p 33306:3306 dyt811:LORISDBv0.3

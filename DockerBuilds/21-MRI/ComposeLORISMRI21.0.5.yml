@@ -7,7 +7,7 @@ version: '3.7'
 services:
 
     # This is the database behind the LORIS 21 instance: note all data are stored in the dockerfile
-    lorisdbmri:
+    lorismridb:
          # Container name and label
         #container_name: LORIS_MySQLDB_${tag}
 
@@ -22,6 +22,9 @@ services:
             args:
                 - ARGS_MYSQL_ROOT_PASSWORD=${LorisMySQLRootPassword}
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
+
+        image: neonatalbrainplatform/lorismridb:{LORIS_version}
+
         networks:
              - backend
         ports:
@@ -30,7 +33,7 @@ services:
         logging:
             driver: "none"
 
-        image: neonatalbrainplatform/lorismridb:{LORIS_version}
+
 
     # This is the docker image of running images
     lorismri:
@@ -39,7 +42,7 @@ services:
 
         build:
             context: ../..
-            dockerfile: DockerBuilds/21/Dockerfile.LORISMRI${LORIS_version}.Ubuntu18
+            dockerfile: DockerBuilds/21-MRI/Dockerfile.LORISMRI${LORIS_version}.Ubuntu18
             args:
                 - ARGS_ProjectName=${LORISProjectName}
                 - ARGS_LorisMySQLHost=${LorisMySQLHost}
@@ -52,7 +55,7 @@ services:
         networks:
             - backend
         depends_on:
-            - lorisdb
+            - lorismridb
         ports:
             - "${Port_LORIS_HTTP}:80"
             - "${Port_LORIS_HTTPS}:443"
@@ -80,7 +83,7 @@ services:
         #container_name: DC_LORIS21Configurator_${tag}
         build:
             context: ../..
-            dockerfile: DockerBuilds/21/Dockerfile.LORISMRI${LORIS_version}.SeleniumPythonDBConfig
+            dockerfile: DockerBuilds/21-MRI/Dockerfile.LORISMRI${LORIS_version}.dbsetup
             args:
                 - ARGS_LorisMySQLHost=${LorisMySQLHost}
                 - ARGS_LorisMySQLRoot=${LorisMySQLRoot}
@@ -98,8 +101,8 @@ services:
         ports:
           - "5900-5999:5900"
         depends_on: # all these need to be up and running before running the Selenium integrator.
-          - LORIS
-          - MySQL
+          - lorismri
+          - lorismridb
           - hub
           - chrome
         networks:

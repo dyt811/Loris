@@ -43,7 +43,7 @@ print("First page configuration past")
 
 # Wait 15 seconds.
 import time
-time.sleep(15)
+time.sleep(5)
 
 
 input_lorismysqluser = chrome.find_element_by_name("lorismysqluser")
@@ -62,9 +62,4 @@ button_submit = chrome.find_element_by_xpath("//input[@type='submit']")
 button_submit.click()
 print("Second page configuration past")
 chrome.quit()
-print("All configuration finished. Now updating database. ")
-
-# All the os.env variables automatically will past on to the child proceess.
-os.environ["LorisMySQLHost"] = "localhost:33306"
-import subprocess
-rc = subprocess.call("update_database.sh")
+print("All configuration finished.")

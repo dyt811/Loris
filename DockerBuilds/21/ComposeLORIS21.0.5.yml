@@ -83,7 +83,7 @@ services:
 
         build:
             context: ../..
-            dockerfile: DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.SeleniumPythonDBConfig
+            dockerfile: DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.dbsetup
             args:
                 - ARGS_LorisMySQLHost=${LorisMySQLHost}
                 - ARGS_LorisMySQLRoot=${LorisMySQLRoot}

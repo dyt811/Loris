@@ -75,7 +75,7 @@ RUN service apache2 restart
 
 CMD apachectl -D FOREGROUND
 # Docker Build Code (In the LORIS root dir):
-# docker build -f ./DockerBuilds/Dockerfile.LORIS22.Ubuntu18 --build-arg project_name=TestLORISProject -t dyt811:v0.7 .
+# docker build -f ./DockerBuilds/Dockerfile.LORIS22.0.0.Ubuntu18 --build-arg project_name=TestLORISProject -t dyt811:v0.7 .
 
 # Docker Run Code (This will bind the configuration interface)
 # docker run -d -it -p 8000:80 -p 8443:443 dyt811:v0.7
