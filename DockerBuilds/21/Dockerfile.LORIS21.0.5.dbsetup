@@ -34,13 +34,13 @@ ENV Port_LORIS_HTTP ${ARGS_Port_LORIS_HTTP}
 ARG ARGS_LORIS21=DefaultLORIS21
 ENV LORISURL ${ARGS_LORIS21}
 
-
+# Copy files ot the setup folder within the container
 COPY DockerBuilds/requirements.txt /setup/
-COPY DockerBuilds/21/LORISDB21Setup_Remote.py /setup/
+COPY DockerBuilds/21/LORISDB21Setup.py /setup/
 
 # Install requirements for selenium
 RUN python -m pip install -r /setup/requirements.txt
 
 # Setup LORIS using the script.
-CMD python /setup/LORISDB21Setup_Remote.py
+CMD python /setup/LORISDB21Setup.py
 

@@ -12,7 +12,8 @@ docker rm 21_lorisdb_1
 docker rm 21_lorisdbsetup_1
 
 # nuke container images
-docker rmi 21_lorisdbsetup:latest
+docker rmi neonatalbrainplatform/lorisdbsetup:21.0.5
+
 #docker rmi dyt811:DC_LORIS21_v0.4
 
 # sanity check on results
