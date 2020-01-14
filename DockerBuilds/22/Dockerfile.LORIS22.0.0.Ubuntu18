@@ -1,5 +1,9 @@
 FROM ubuntu:18.04
 
+LABEL maintainer="Yang Ding, it@cnbp.ca"
+LABEL description="This base image couple the frontend of LORIS with a backend MySQL with NO OTHER THINGS SETUP!"
+LABEL type="LORIS22.0.0 Base Image"
+
 # Update APT-GET as root, install SUDO
 RUN apt-get update
 
@@ -11,7 +15,12 @@ RUN useradd -m lorisadmin && echo "lorisadmin:lorisadmin" | chpasswd && adduser 
 
 USER root
 
-ARG project_name=TestDeployedLORISProject
+ARG ARGS_ProjectName=TestDeployedLORISProject
+ARG ARGS_LorisMySQLDatabase=PlaceHolderDatabase
+ARG ARGS_LorisMySQLUser=PlaceHolderUser
+ARG ARGS_LorisMySQLUserPassword=PlaceHolderUserPassword
+ARG ARGS_LorisMySQLHost=PlaceHolderHost
+
 
 # install dependencies:
 RUN apt-get update && apt-get install -y mysql-client mysql-server
@@ -29,45 +38,45 @@ USER root
 WORKDIR /var/www
 RUN wget https://github.com/aces/Loris/archive/v22.0.0.zip -O release.zip
 RUN unzip release.zip
-RUN mv Loris-22.0.0 ${project_name}
+RUN mv Loris-22.0.0 ${ARGS_ProjectName}
 RUN rm release.zip
-RUN chown -R lorisadmin.lorisadmin ${project_name}
+RUN chown -R lorisadmin.lorisadmin ${ARGS_ProjectName}
 
 # Under LORISAdmin, install
 USER lorisadmin
 # Install script must run from tool directory.
-WORKDIR /var/www/${project_name}/tools
-COPY ./tools/install_lorisadmin.sh /var/www/${project_name}/tools/install_lorisadmin.sh
-COPY ./tools/install_sudo.sh /var/www/${project_name}/tools/install_sudo.sh
+WORKDIR /var/www/${ARGS_ProjectName}/tools
+COPY ./tools/install_lorisadmin.sh /var/www/${ARGS_ProjectName}/tools/install_lorisadmin.sh
+COPY ./tools/install_sudo.sh /var/www/${ARGS_ProjectName}/tools/install_sudo.sh
 
 
 
 # Must ensure both of these files are set as executable by running CHMOD to update the permission.
 USER root
-RUN chmod 775 /var/www/${project_name}/tools/install_lorisadmin.sh
-RUN chmod 775 /var/www/${project_name}/tools/install_sudo.sh
+RUN chmod 775 /var/www/${ARGS_ProjectName}/tools/install_lorisadmin.sh
+RUN chmod 775 /var/www/${ARGS_ProjectName}/tools/install_sudo.sh
 
 # Must not run as root.
 USER lorisadmin
-RUN /var/www/${project_name}/tools/install_lorisadmin.sh
+RUN /var/www/${ARGS_ProjectName}/tools/install_lorisadmin.sh
 
 USER root
-RUN /var/www/${project_name}/tools/install_sudo.sh ${project_name}
+RUN /var/www/${ARGS_ProjectName}/tools/install_sudo.sh ${ARGS_ProjectName}
 # Must run frm /var/www/LORIS/tools folder
 # Must not exist: /var/www/LORIS/project/config.xml:
 # Must be using Bash.
 # Must not run as root.
 # PHP must be installed.
-# Make sure apache2 is not already configured for the ${projectname}
+# Make sure apache2 is not already configured for the ${ARGS_ProjectName}
 
 # project name
 # lorisadmin password
 USER root
-WORKDIR /var/www/${project_name}/
+WORKDIR /var/www/${ARGS_ProjectName}/
 RUN make
 RUN a2enmod rewrite
 #RUN a2dissite default
-RUN a2ensite ${project_name}
+RUN a2ensite ${ARGS_ProjectName}
 EXPOSE 80
 RUN service apache2 restart
 # Apache MUST be run on the foreground for it to not be stopped!

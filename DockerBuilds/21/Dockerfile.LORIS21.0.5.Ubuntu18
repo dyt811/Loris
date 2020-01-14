@@ -2,7 +2,7 @@ FROM ubuntu:18.04
 
 LABEL maintainer="Yang Ding, it@cnbp.ca"
 LABEL description="This base image couple the frontend of LORIS with a backend MySQL with NO OTHER THINGS SETUP!"
-LABEL type="LORIS21.05 Base Image"
+LABEL type="LORIS21.0.5 Base Image"
 
 # Update APT-GET as root, install SUDO
 RUN apt-get update

@@ -4,7 +4,6 @@ version: '3.7'
 # Last updated: 2019-01-13 12:15
 # Maintainer: Yang Ding (it@cnbp.ca)
 
-
 services:
 
     # This is the database behind the LORIS 21 instance: note all data are stored in the dockerfile
@@ -16,7 +15,7 @@ services:
         build:
             context: ../..
             dockerfile:  DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.db
-            # make sure these variadebugbles are properly named in the .env files: e.g .PlaceHolderRootPassword
+            # make sure these variables are properly named in the .env files: e.g .PlaceHolderRootPassword
             args:
                 - ARGS_MYSQL_ROOT_PASSWORD=${LorisMySQLRootPassword}
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .

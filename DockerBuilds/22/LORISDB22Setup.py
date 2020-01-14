@@ -1,26 +1,32 @@
 from selenium import webdriver
 import os
-from selenium.webdriver.chrome.options import Options
-#from dotenv import load_dotenv
-
+from dotenv import load_dotenv
+from pathlib import Path
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+# Note: many env variables are required for this to work. they are normally provided by the DockerFile setup which received them in term from the DockerCompose files.
 
-PORT = os.getenv("Port_LORIS_HTTP")
-LORIS22URL = os.getenv("LORISURL")
-url_configuration ='http://{}:{}/installdb.php'.format(LORIS22URL, PORT)
+#load_dotenv(Path("21/.env"))  # 21.0.5 Config
+#load_dotenv(Path("21-MRI/.env"))  # 21.0.5-MRI Config
+
+
+# "loris" here refer to the loris service in the ComposeLORIS21.0.5.yml.
+# Make sure not to change this name.
+url_configuration ='http://loris:80/installdb.php'
+
+# "hub" here refer to the hub service in the ComposeLORIS21.0.5.yml.
+url_hub = "http://hub:4444/wd/hub"
+
 
 print(url_configuration)
+print(url_hub)
 
-# Wait 15 seconds.
+# Wait 15 seconds to ensure all services are up and running, especially database.
 import time
-time.sleep(5)
-#chrome = webdriver.Remote("http://localhost:4444/wd/hub", DesiredCapabilities.CHROME)
-chrome = webdriver.Chrome(executable_path='/home/yang.ding/git/Loris/DockerBuilds/chromedriver')
-
+time.sleep(15)
+chrome = webdriver.Remote(url_hub, DesiredCapabilities.CHROME)
 
 # Get the variable from the environment past to us from the DOCKERFILE, which received it from Compose
-
 chrome.get(url_configuration)
 
 # Load the information to fill inside
@@ -45,35 +51,33 @@ input_serverhost.send_keys(LorisMySQLRootPassword)
 
 button_submit = chrome.find_element_by_css_selector(".btn-submit")
 button_submit.click()
-print("First page configuration past")
+print("First page auto configuration successful.")
 
-# Wait 15 seconds.
+# Wait 15 seconds before checking second page to submit.
 import time
-time.sleep(15)
+time.sleep(5)
 
 
+# Enter LORIS MySQL User Information
 input_lorismysqluser = chrome.find_element_by_name("lorismysqluser")
 input_lorismysqluser.send_keys(LorisMySQLUser)
 
+# Enter LORIS MySQL User Password Information
 input_lorismysqlpassword = chrome.find_element_by_name("lorismysqlpassword")
 input_lorismysqlpassword.send_keys(LorisMySQLUserPassword)
 
+# Enter LORIS Frontend User Information
 input_frontenduser = chrome.find_element_by_name("frontenduser")
 input_frontenduser.send_keys(LorisFrontendUser)
 
+# Enter LORIS Frontend User Password Information
 input_frontendpassword = chrome.find_element_by_name("frontendpassword")
 input_frontendpassword.send_keys(LorisFrontendPassword)
 
+# Submit the issue for the underlying backend PHP script.
 button_submit = chrome.find_element_by_xpath("//input[@type='submit']")
 button_submit.click()
-print("Second page configuration past")
+print("Second page auto configuration successful.")
+
 chrome.quit()
-print("All configuration finished")
-
-
-"""
-firefox.get('https://localhost:8080/installdb.php')
-print(firefox.title)
-firefox.quit()
-"""
-
+print("All configuration finished.")

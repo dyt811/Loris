@@ -36,7 +36,7 @@ ENV LORISURL ${ARGS_LORIS22}
 
 
 COPY DockerBuilds/requirements.txt /setup/
-COPY DockerBuilds/LORISDB22Setup.py /setup/
+COPY DockerBuilds/22/LORISDB22Setup.py /setup/
 
 # Install requirements for selenium
 RUN python -m pip install -r /setup/requirements.txt
