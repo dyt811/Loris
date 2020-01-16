@@ -12,7 +12,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 # "loris" here refer to the loris service in the ComposeLORIS21.0.5.yml.
 # Make sure not to change this name.
-url_configuration ='http://loris:80/installdb.php'
+url_configuration ='http://lorismri:80/installdb.php'
 
 # "hub" here refer to the hub service in the ComposeLORIS21.0.5.yml.
 url_hub = "http://hub:4444/wd/hub"
@@ -39,6 +39,7 @@ LorisMySQLUserPassword = os.getenv("LorisMySQLUserPassword")
 LorisFrontendUser = os.getenv("LorisFrontendUser")
 LorisFrontendPassword = os.getenv("LorisFrontendPassword")
 
+# need to add ways to check if the loris is already up and running
 
 input_serverhost = chrome.find_element_by_id("serverhost")
 input_serverhost.send_keys(LorisMySQLHost)
@@ -80,5 +81,13 @@ button_submit.click()
 print("Second page auto configuration successful.")
 
 chrome.quit()
-print("All configuration finished.")
+print("Initial configuration finished. Update MySQL update using shell script in 10s")
+
+
+time.sleep(10)
+
+# Launch the MRI db update subscript.
+import subprocess
+# /setup is specified in the dbsetup folder.
+subprocess.call(['/setup/Bash.LORISMRI21.0.5.sh'])
 

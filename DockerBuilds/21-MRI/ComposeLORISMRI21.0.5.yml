@@ -7,6 +7,7 @@ version: '3.7'
 services:
 
     # This is the database behind the LORIS 21 instance: note all data are stored in the dockerfile
+    # DO NOT CHANGE THE service names as some of them are hard coded to dependent on each other.
     lorismridb:
          # Container name and label
         #container_name: LORIS_MySQLDB_${tag}
@@ -22,16 +23,16 @@ services:
             args:
                 - ARGS_MYSQL_ROOT_PASSWORD=${LorisMySQLRootPassword}
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
-
         image: neonatalbrainplatform/lorisdb:${LORIS_version}-MRI
 
         networks:
              - backend
         ports:
             - "${Port_MySQL}:3306"
-
-        logging:
-            driver: "none"
+        expose:
+          - 3306
+        #logging:
+#            driver: "none"
 
 
 
@@ -98,6 +99,15 @@ services:
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
         # Where to push eventually.
         image: neonatalbrainplatform/lorisdbsetup:${LORIS_version}-MRI
+
+        environment:
+            # Additional variable used by the imaging pipeline to customize the database AFTER it has been setup: these are loaded from .env files straight in the OS ENV
+            LorisMySQLDatabase: ${LorisMySQLDatabase}
+            LorisMySQLUser: ${LorisMySQLUser}
+            LorisMySQLUserPassword: ${LorisMySQLUserPassword}
+            LORISProjectName: ${MyLORISProject}
+            LorisMaintenanceEmail: ${LorisMaintenanceEmail}
+
         stdin_open: true
         tty: true
         ports:

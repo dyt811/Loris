@@ -123,6 +123,8 @@ RUN apt-get install -y dcmtk
 
 RUN echo "source /data/${ARGS_ProjectName}/bin/mri/environment" >> /home/lorisadmin/.bashrc
 
+RUN apt-get install -y dnsutils
+
 CMD source /home/lorisadmin/.bashrc
 
 
