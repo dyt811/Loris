@@ -24,3 +24,5 @@ mysql $MySQLDatabase -hlorismridb -p3306 -u$MySQLUser -p$MySQLUserPassword -A -e
 
 # MODIFIED #33 to reduce the amount of solidity check.
 mysql $MySQLDatabase -hlorismridb -p3306 -u$MySQLUser -p$MySQLUserPassword -A -e "UPDATE Config SET Value='/data/$ProjectName/bin/mri/' WHERE ConfigID=(SELECT ID FROM ConfigSettings WHERE Name='MRICodePath')"
+
+echo "Basic LORIS MRI 21.0.5 database update is now complete. "

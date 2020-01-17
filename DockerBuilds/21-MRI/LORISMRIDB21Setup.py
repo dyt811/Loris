@@ -89,5 +89,5 @@ time.sleep(10)
 # Launch the MRI db update subscript.
 import subprocess
 # /setup is specified in the dbsetup folder.
-subprocess.call(['/setup/Bash.LORISMRI21.0.5.sh'])
+subprocess.call(['/setup/Bash.CNBPLORISMRI21.0.5.sh'])
 

@@ -87,38 +87,39 @@ services:
             - "4444:4444"
         networks:
             - backend
-
-    lorisdbsetup:
-
-        build:
-            context: ../..
-            dockerfile: DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.dbsetup
-            args:
-                - ARGS_MySQLHost=${MySQLHost}
-                - ARGS_MySQLRoot=${MySQLRoot}
-                - ARGS_MySQLRootPassword=${MySQLRootPassword}
-                - ARGS_MySQLUser=${MySQLUser}
-                - ARGS_MySQLUserPassword=${MySQLUserPassword}
-                - ARGS_LorisFrontendUser=${LorisFrontendUser}
-                - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
-                - ARGS_Port_LORIS_HTTP=${Port_LORIS_HTTP}
-                - ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
-                - ARGS_LORIS21=LORIS # the database created by default is called LORIS
-            # Environment not specified as the DockerFile is suppose to be standalone and workable too .
-        # Where to push eventually.
-        image: neonatalbrainplatform/lorisdbsetup:${LORIS_version}
-
-        stdin_open: true
-        tty: true
-        ports:
-          - "5900-5999:5900"
-        depends_on: # all these need to be up and running before running the Selenium integrator.
-          - loris
-          - lorisdb
-          - hub
-          - chrome
-        networks:
-            - backend
+#
+#    lorisdbsetup:
+#
+#        build:
+#            context: ../..
+#            dockerfile: DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.dbsetup
+#            args:
+#                - ARGS_MySQLHost=${MySQLHost}
+#                - ARGS_MySQLRoot=${MySQLRoot}
+#                - ARGS_MySQLRootPassword=${MySQLRootPassword}
+#                - ARGS_MySQLUser=${MySQLUser}
+#                - ARGS_MySQLUserPassword=${MySQLUserPassword}
+#                - ARGS_LorisFrontendUser=${LorisFrontendUser}
+#                - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
+#                - ARGS_Port_LORIS_HTTP=${Port_LORIS_HTTP}
+#                - ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
+#                - ARGS_LORIS21=LORIS # the database created by default is called LORIS
+#            # Environment not specified as the DockerFile is suppose to be standalone and workable too .
+#        # Where to push eventually.
+#        image: neonatalbrainplatform/lorisdbsetup:${LORIS_version}
+#
+#        stdin_open: true
+#        tty: true
+#        ports:
+#          - "5900-5999:5900"
+#        depends_on: # all these need to be up and running before running the Selenium integrator.
+#          - loris
+#          - lorisdb
+#          - hub
+#          - chrome
+#          -
+#        networks:
+#            - backend
 
 # Networks allow connection with EXTERNAL containers and PROJECTS
 networks:

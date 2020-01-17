@@ -30,10 +30,6 @@ ENV LorisFrontendPassword ${ARGS_LorisFrontendPassword}
 ARG ARGS_Port_LORIS_HTTP=DefaultPort_LORIS_HTTP
 ENV Port_LORIS_HTTP ${ARGS_Port_LORIS_HTTP}
 
-# Set the env based on the value of the arguments.
-ARG ARGS_LORIS21=DefaultLORIS21
-ENV LORISURL ${ARGS_LORIS21}
-
 # Copy files ot the setup folder within the container
 COPY DockerBuilds/requirements.txt /setup/
 COPY DockerBuilds/21/LORISDB21Setup.py /setup/

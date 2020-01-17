@@ -102,7 +102,6 @@ services:
                 - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
                 - ARGS_Port_LORIS_HTTP=${Port_LORIS_HTTP}
                 - ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
-                - ARGS_LORIS21=LORIS # the database created by default is called LORIS
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
         # Where to push eventually.
         image: neonatalbrainplatform/lorisdbsetup:${LORIS_version}
