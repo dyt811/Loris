@@ -30,24 +30,24 @@ chrome = webdriver.Remote(url_hub, DesiredCapabilities.CHROME)
 chrome.get(url_configuration)
 
 # Load the information to fill inside
-LorisMySQLHost = os.getenv("LorisMySQLHost")
-LorisMySQLRoot = os.getenv("LorisMySQLRoot")
-LorisMySQLRootPassword = os.getenv("LorisMySQLRootPassword")
+MySQLHost = os.getenv("MySQLHost")
+MySQLRoot = os.getenv("MySQLRoot")
+MySQLRootPassword = os.getenv("MySQLRootPassword")
 # Set the env based on the value of the arip and port on which hub running onguments
-LorisMySQLUser = os.getenv("LorisMySQLUser")
-LorisMySQLUserPassword = os.getenv("LorisMySQLUserPassword")
+MySQLUser = os.getenv("MySQLUser")
+MySQLUserPassword = os.getenv("MySQLUserPassword")
 LorisFrontendUser = os.getenv("LorisFrontendUser")
 LorisFrontendPassword = os.getenv("LorisFrontendPassword")
 
 
 input_serverhost = chrome.find_element_by_id("serverhost")
-input_serverhost.send_keys(LorisMySQLHost)
+input_serverhost.send_keys(MySQLHost)
 
 input_serverhost = chrome.find_element_by_id("serveruser")
-input_serverhost.send_keys(LorisMySQLRoot)
+input_serverhost.send_keys(MySQLRoot)
 
 input_serverhost = chrome.find_element_by_id("serverpassword")
-input_serverhost.send_keys(LorisMySQLRootPassword)
+input_serverhost.send_keys(MySQLRootPassword)
 
 button_submit = chrome.find_element_by_css_selector(".btn-submit")
 button_submit.click()
@@ -60,11 +60,11 @@ time.sleep(5)
 
 # Enter LORIS MySQL User Information
 input_lorismysqluser = chrome.find_element_by_name("lorismysqluser")
-input_lorismysqluser.send_keys(LorisMySQLUser)
+input_lorismysqluser.send_keys(MySQLUser)
 
 # Enter LORIS MySQL User Password Information
 input_lorismysqlpassword = chrome.find_element_by_name("lorismysqlpassword")
-input_lorismysqlpassword.send_keys(LorisMySQLUserPassword)
+input_lorismysqlpassword.send_keys(MySQLUserPassword)
 
 # Enter LORIS Frontend User Information
 input_frontenduser = chrome.find_element_by_name("frontenduser")

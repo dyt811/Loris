@@ -3,23 +3,23 @@ FROM python:3.7
 # First page configuraiton variables.
 
 # Set default value while let people access these externally.
-ARG ARGS_LorisMySQLHost=DefaultLorisMySQLHost
-ENV LorisMySQLHost ${ARGS_LorisMySQLHost}
+ARG ARGS_MySQLHost=DefaultMySQLHost
+ENV MySQLHost ${ARGS_MySQLHost}
 
-ARG ARGS_LorisMySQLRoot=DefaultLorisMySQLRoot
-ENV LorisMySQLRoot ${ARGS_LorisMySQLRoot}
+ARG ARGS_MySQLRoot=DefaultMySQLRoot
+ENV MySQLRoot ${ARGS_MySQLRoot}
 
-ARG ARGS_LorisMySQLRootPassword=DefaultLorisMySQLRootPassword
-ENV LorisMySQLRootPassword ${ARGS_LorisMySQLRootPassword}
+ARG ARGS_MySQLRootPassword=DefaultMySQLRootPassword
+ENV MySQLRootPassword ${ARGS_MySQLRootPassword}
 # Set the env based on the value of the arguments.
 
 # Second page configuraiton variables.
 # Set default value while let people access these externally.
-ARG ARGS_LorisMySQLUser=DefaultLorisMySQLUser
-ENV LorisMySQLUser ${ARGS_LorisMySQLUser}
+ARG ARGS_MySQLUser=DefaultMySQLUser
+ENV MySQLUser ${ARGS_MySQLUser}
 
-ARG ARGS_LorisMySQLUserPassword=DefaultLorisMySQLUserPassword
-ENV LorisMySQLUserPassword ${ARGS_LorisMySQLUserPassword}
+ARG ARGS_MySQLUserPassword=DefaultMySQLUserPassword
+ENV MySQLUserPassword ${ARGS_MySQLUserPassword}
 
 ARG ARGS_LorisFrontendUser=DefaultLorisFrontendUser
 ENV LorisFrontendUser ${ARGS_LorisFrontendUser}

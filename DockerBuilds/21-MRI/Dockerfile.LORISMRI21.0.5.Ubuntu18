@@ -110,13 +110,13 @@ RUN cp ./dicom-archive/profileTemplate.pl ./dicom-archive/.loris_mri/prodDataBas
 RUN chmod 640 ./dicom-archive/.loris_mri/prodDataBase
 RUN chgrp www-data ./dicom-archive/.loris_mri/prodDataBase
 
-RUN sed -e "s#DBNAME#${ARGS_LorisMySQLDatabase}#g" -e "s#DBUSER#${ARGS_LorisMySQLUser}#g" -e "s#DBPASS#$ARGS_LorisMySQLUserPassword#g" -e "s#DBHOST#$ARGS_LorisMySQLHost#g" ./dicom-archive/profileTemplate.pl > ./dicom-archive/.loris_mri/prodDataBase
+RUN sed -e "s#DBNAME#${ARGS_MySQLDatabase}#g" -e "s#DBUSER#${ARGS_MySQLUser}#g" -e "s#DBPASS#$ARGS_MySQLUserPassword#g" -e "s#DBHOST#$ARGS_MySQLHost#g" ./dicom-archive/profileTemplate.pl > ./dicom-archive/.loris_mri/prodDataBase
 
 #Creating python database config file with database credentials"
 RUN cp ./dicom-archive/database_config_template.py ./dicom-archive/.loris_mri/database_config.py
 RUN chmod 640 ./dicom-archive/.loris_mri/database_config.py
 RUN chgrp www-data ./dicom-archive/.loris_mri/database_config.py
-RUN sed -e "s#DBNAME#${ARGS_LorisMySQLDatabase}#g" -e "s#DBUSER#${ARGS_LorisMySQLUser}#g" -e "s#DBPASS#${ARGS_LorisMySQLUserPassword}#g" -e "s#DBHOST#${ARGS_LorisMySQLHost}#g" ./dicom-archive/database_config_template.py > ./dicom-archive/.loris_mri/database_config.py
+RUN sed -e "s#DBNAME#${ARGS_MySQLDatabase}#g" -e "s#DBUSER#${ARGS_MySQLUser}#g" -e "s#DBPASS#${ARGS_MySQLUserPassword}#g" -e "s#DBHOST#${ARGS_MySQLHost}#g" ./dicom-archive/database_config_template.py > ./dicom-archive/.loris_mri/database_config.py
 # config file for python import scripts is located at ./dicom-archive/.loris_mri/database_config.py"
 
 RUN apt-get install -y dcmtk

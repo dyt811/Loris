@@ -16,10 +16,10 @@ RUN useradd -m lorisadmin && echo "lorisadmin:lorisadmin" | chpasswd && adduser 
 USER root
 
 ARG ARGS_ProjectName=TestDeployedLORISProject
-ARG ARGS_LorisMySQLDatabase=PlaceHolderDatabase
-ARG ARGS_LorisMySQLUser=PlaceHolderUser
-ARG ARGS_LorisMySQLUserPassword=PlaceHolderUserPassword
-ARG ARGS_LorisMySQLHost=PlaceHolderHost
+ARG ARGS_MySQLDatabase=PlaceHolderDatabase
+ARG ARGS_MySQLUser=PlaceHolderUser
+ARG ARGS_MySQLUserPassword=PlaceHolderUserPassword
+ARG ARGS_MySQLHost=PlaceHolderHost
 
 
 # install dependencies:

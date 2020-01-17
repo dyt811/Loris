@@ -15,7 +15,7 @@ services:
             dockerfile:  DockerBuilds/22/Dockerfile.LORIS${LORIS_version}.db
             # make sure these variables are properly named in the .env files: e.g .PlaceHolderRootPassword
             args:
-                - ARGS_MYSQL_ROOT_PASSWORD=${LorisMySQLRootPassword}
+                - ARGS_MYSQL_ROOT_PASSWORD=${MySQLRootPassword}
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
         networks:
              - backend
@@ -31,7 +31,7 @@ services:
             context: ../..
             dockerfile: DockerBuilds/22/Dockerfile.LORIS${LORIS_version}.Ubuntu18
             args:
-                - project_name=${LORISProjectName}
+                - project_name=${ProjectName}
         networks:
             - backend
         depends_on:
@@ -66,11 +66,11 @@ services:
 #            context: ../
 #            dockerfile: DockerBuilds/Dockerfile.LORIS${LORIS_version}.SeleniumPythonDBConfig
 #            args:
-#                - ARGS_LorisMySQLHost=${LorisMySQLHost}
-#                - ARGS_LorisMySQLRoot=${LorisMySQLRoot}
-#                - ARGS_LorisMySQLRootPassword=${LorisMySQLRootPassword}
-#                - ARGS_LorisMySQLUser=${LorisMySQLUser}
-#                - ARGS_LorisMySQLUserPassword=${LorisMySQLUserPassword}
+#                - ARGS_MySQLHost=${MySQLHost}
+#                - ARGS_MySQLRoot=${MySQLRoot}
+#                - ARGS_MySQLRootPassword=${MySQLRootPassword}
+#                - ARGS_MySQLUser=${MySQLUser}
+#                - ARGS_MySQLUserPassword=${MySQLUserPassword}
 #                - ARGS_LorisFrontendUser=${LorisFrontendUser}
 #                - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
 #                - ARGS_Port_LORIS_HTTP=${Port_LORIS_HTTP}
