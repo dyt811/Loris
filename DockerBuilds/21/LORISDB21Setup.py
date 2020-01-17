@@ -79,6 +79,10 @@ button_submit = chrome.find_element_by_xpath("//input[@type='submit']")
 button_submit.click()
 print("Second page auto configuration successful.")
 
+# Wait 15 seconds before checking second page to submit.
+import time
+time.sleep(5)
+
 chrome.quit()
 print("All configuration finished.")
 
