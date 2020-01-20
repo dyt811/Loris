@@ -22,7 +22,7 @@ services:
         networks:
              - backend
         ports:
-            - "${Port_MySQL}:3306"
+            - "${Ext_Port_MySQL}:3306"
 
         # Container name and label
         #container_name: LORIS_MySQLDB_${tag}
@@ -48,7 +48,7 @@ services:
                 - ARGS_MySQLUser=${MySQLUser}
                 - ARGS_MySQLUserPassword=${MySQLUserPassword}
                 - ARGS_MySQLDatabase=${MySQLDatabase}
-                - ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
+                #- ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
 
         # Where to push eventually.
         image: neonatalbrainplatform/loris:${LORIS_version}
@@ -58,8 +58,8 @@ services:
         depends_on:
             - lorisdb
         ports:
-            - "${Port_LORIS_HTTP}:80"
-            - "${Port_LORIS_HTTPS}:443"
+            - "${Ext_Port_HTTP}:80"
+            - "${Ext_Port_HTTPS}:443"
 
      # This is the selenium image (i.e. worker node) that will run the actual work process which is executed to setup the bridge connection between the database and the front end user interaction
     chrome:
@@ -101,14 +101,13 @@ services:
                 - ARGS_MySQLUserPassword=${MySQLUserPassword}
                 - ARGS_LorisFrontendUser=${LorisFrontendUser}
                 - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
-                - ARGS_Port_LORIS_HTTP=${Port_LORIS_HTTP}
-                - ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
-                - ARGS_LORIS21=LORIS # the database created by default is called LORIS
+                - ARGS_Ext_Port_HTTP=${Ext_Port_HTTP}
+                - ARGS_Ext_URL=${Ext_URL}
+                #- ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
+                - ARGS_MySQLDatabase=${MySQLDatabase} # the database created by default is called LORIS
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
         # Where to push eventually.
         image: neonatalbrainplatform/lorisdbsetup:${LORIS_version}
-        ports:
-          - "5900-5999:5900"
         depends_on: # all these need to be up and running before running the Selenium integrator.
           - loris
           - lorisdb

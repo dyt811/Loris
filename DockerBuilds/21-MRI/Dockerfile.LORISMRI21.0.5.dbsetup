@@ -31,8 +31,8 @@ ENV LorisFrontendUser ${ARGS_LorisFrontendUser}
 ARG ARGS_LorisFrontendPassword=DefaultLorisFrontendPassword
 ENV LorisFrontendPassword ${ARGS_LorisFrontendPassword}
 
-ARG ARGS_Port_LORIS_HTTP=DefaultPort_LORIS_HTTP
-ENV Port_LORIS_HTTP ${ARGS_Port_LORIS_HTTP}
+ARG ARGS_Ext_Port_HTTP=DefaultExt_Port_HTTP
+ENV Ext_Port_HTTP ${ARGS_Ext_Port_HTTP}
 
 # MySQLDatabase variable is required in order for the MySQL Client to update the database with the proper path information
 ARG ARGS_MySQLDatabase=DefaultMySQLDatabase

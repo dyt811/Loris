@@ -1,7 +1,11 @@
 FROM python:3.7
 
-# First page configuraiton variables.
+#RUN apt-get install -y libmysqlclient-dev python-dev mysql-server python-mysqldb
+# Numerous environmental variables are set based on the argument past to it from the DockerCompose file, which are subsequently used by the Python script to drive Selenium
 
+######################################
+# First page configuraiton variables.
+######################################
 # Set default value while let people access these externally.
 ARG ARGS_MySQLHost=DefaultMySQLHost
 ENV MySQLHost ${ARGS_MySQLHost}
@@ -13,7 +17,10 @@ ARG ARGS_MySQLRootPassword=DefaultMySQLRootPassword
 ENV MySQLRootPassword ${ARGS_MySQLRootPassword}
 # Set the env based on the value of the arguments.
 
+######################################
 # Second page configuraiton variables.
+######################################
+
 # Set default value while let people access these externally.
 ARG ARGS_MySQLUser=DefaultMySQLUser
 ENV MySQLUser ${ARGS_MySQLUser}
@@ -21,14 +28,25 @@ ENV MySQLUser ${ARGS_MySQLUser}
 ARG ARGS_MySQLUserPassword=DefaultMySQLUserPassword
 ENV MySQLUserPassword ${ARGS_MySQLUserPassword}
 
+# Set default frontend user related credential
 ARG ARGS_LorisFrontendUser=DefaultLorisFrontendUser
 ENV LorisFrontendUser ${ARGS_LorisFrontendUser}
 
 ARG ARGS_LorisFrontendPassword=DefaultLorisFrontendPassword
 ENV LorisFrontendPassword ${ARGS_LorisFrontendPassword}
 
-ARG ARGS_Port_LORIS_HTTP=DefaultPort_LORIS_HTTP
-ENV Port_LORIS_HTTP ${ARGS_Port_LORIS_HTTP}
+ARG ARGS_Ext_Port_HTTP=DefaultExt_Port_HTTP
+ENV Ext_Port_HTTP ${ARGS_Ext_Port_HTTP}
+
+ARG ARGS_MySQLDatabase=DefaultMySQLDatabase
+ENV MySQLDatabase ${ARGS_MySQLDatabase}
+
+ARG ARGS_Ext_Port_HTTP=DefaultExtPortHttp
+ENV Ext_Port_HTTP=${ARGS_Ext_Port_HTTP}
+
+ARG ARGS_Ext_URL=DefaultExtURL
+ENV Ext_URL=${ARGS_Ext_URL}
+
 
 # Copy files ot the setup folder within the container
 COPY DockerBuilds/requirements.txt /setup/

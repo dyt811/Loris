@@ -27,13 +27,8 @@ ENV LorisFrontendUser ${ARGS_LorisFrontendUser}
 ARG ARGS_LorisFrontendPassword=DefaultLorisFrontendPassword
 ENV LorisFrontendPassword ${ARGS_LorisFrontendPassword}
 
-ARG ARGS_Port_LORIS_HTTP=DefaultPort_LORIS_HTTP
-ENV Port_LORIS_HTTP ${ARGS_Port_LORIS_HTTP}
-
-# Set the env based on the value of the arguments.
-ARG ARGS_LORIS22=DefaultLORIS22
-ENV LORISURL ${ARGS_LORIS22}
-
+ARG ARGS_Ext_Port_HTTP=DefaultExt_Port_HTTP
+ENV Ext_Port_HTTP ${ARGS_Ext_Port_HTTP}
 
 COPY DockerBuilds/requirements.txt /setup/
 COPY DockerBuilds/22/LORISDB22Setup.py /setup/

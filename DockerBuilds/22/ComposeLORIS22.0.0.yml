@@ -21,7 +21,7 @@ services:
         networks:
              - backend
         ports:
-            - "${Port_MySQL}:3306"
+            - "${Ext_Port_MySQL}:3306"
 
         # Container name and label
         #container_name: LORIS_MySQLDB_${tag}
@@ -57,8 +57,8 @@ services:
         depends_on:
             - lorisdb
         ports:
-            - "${Port_LORIS_HTTP}:80"
-            - "${Port_LORIS_HTTPS}:443"
+            - "${Ext_Port_HTTP}:80"
+            - "${Ext_Port_HTTPS}:443"
 
      # This is the selenium image (i.e. worker node) that will run the actual work process which is executed to setup the bridge connection between the database and the front end user interaction
     chrome:
@@ -100,7 +100,7 @@ services:
                 - ARGS_MySQLUserPassword=${MySQLUserPassword}
                 - ARGS_LorisFrontendUser=${LorisFrontendUser}
                 - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
-                - ARGS_Port_LORIS_HTTP=${Port_LORIS_HTTP}
+                - ARGS_Ext_Port_HTTP=${Ext_Port_HTTP}
                 - ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
         # Where to push eventually.
