@@ -40,14 +40,10 @@ ENV MySQLDatabase ${ARGS_MySQLDatabase}
 
 # This is the email variable used for user to reach out to us.
 ARG ARGS_LorisMaintenanceEmail=DefaultLorisMaintenanceEmail
-ENV LorisMaintenanceEmail=ARGS_LorisMaintenanceEmail
+ENV LorisMaintenanceEmail=${ARGS_LorisMaintenanceEmail}
 
 
 COPY DockerBuilds/21-MRI/LORISMRIDB21Setup.py /setup/
-
-# Carry all the previous variable and environmental variable from the earlier Docker image.
-COPY DockerBuilds/21-MRI/Bash.CNBPLORISMRI21.0.5.sh /setup/
-RUN chmod +x /setup/Bash.CNBPLORISMRI21.0.5.sh
 
 # Setup LORIS using the script, this script will launch the above shell script!
 CMD python /setup/LORISMRIDB21Setup.py

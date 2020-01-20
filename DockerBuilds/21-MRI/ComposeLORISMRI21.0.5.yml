@@ -1,6 +1,6 @@
 version: '3.7'
 # This is the Docker-Compose orchestration of LORIS WITH MRI component pre-configured.
-# Last updated: 2019-01-13 12:15
+# Last updated: 2019-01-20 17:12
 # Maintainer: Yang Ding (it@cnbp.ca)
 
 
@@ -12,35 +12,38 @@ services:
          # Container name and label
         #container_name: LORIS_MySQLDB_${tag}
 
-
-         #volumes:
-         #    - //c/git/data:/var/lib/mysql
+        # Building instructions.
+        #volumes:
+        #    - //c/git/data:/var/lib/mysql
         build:
             context: ../..
             # Still using the same shared Dockerfile from the base LORIS image.
             dockerfile:  DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.db
-            # make sure these variadebugbles are properly named in the .env files: e.g .PlaceHolderRootPassword
+            # make sure these variables are properly named in the .env files: e.g .PlaceHolderRootPassword
             args:
                 - ARGS_MYSQL_ROOT_PASSWORD=${MySQLRootPassword}
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
-        image: neonatalbrainplatform/lorisdb:${LORIS_version}-MRI
-
         networks:
              - backend
+
         ports:
             - "${Ext_Port_MySQL}:3306"
         expose:
           - 3306
-        #logging:
-#            driver: "none"
+
+        image: neonatalbrainplatform/lorisdb:${LORIS_version}-MRI
+
+        logging:
+            driver: "none"
 
 
-
+    # The loris frontned is HARDCODED to be recognized in subroutines as "loris" DO NOT CHANGE THIS NAME.
     # This is the docker image of running images
     lorismri:
          # Container name and label
         #container_name: LORIS_${tag}
 
+        # Building instructions.
         build:
             context: ../..
             dockerfile: DockerBuilds/21-MRI/Dockerfile.LORISMRI${LORIS_version}.Ubuntu18
@@ -49,8 +52,9 @@ services:
                 - ARGS_MySQLHost=${MySQLHost}
                 - ARGS_MySQLUser=${MySQLUser}
                 - ARGS_MySQLUserPassword=${MySQLUserPassword}
-                - ARGS_MySQLDatabase=LORIS
-                - ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
+                - ARGS_MySQLDatabase=${MySQLDatabase}
+                #- ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
+
         image: neonatalbrainplatform/loris:${LORIS_version}-MRI
 
         networks:
@@ -68,15 +72,23 @@ services:
           - /dev/shm:/dev/shm
         depends_on:
           - hub
+          - lorismri
+          - lorismridb
         environment:
           HUB_HOST: hub
+          HUB_PORT: 4444
+        entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME" /opt/bin/entry_point.sh'
         networks:
           - backend
 
+    # The hub is HARDCODED to be recognized in subroutines as "hub" DO NOT CHANGE THIS NAME.
     hub:
         image: selenium/hub:3.14.0-gallium
+        depends_on:
+            - lorismri
+            - lorismridb
         ports:
-          - "4444:4444"
+            - "4444:4444"
         networks:
             - backend
 
@@ -88,23 +100,19 @@ services:
             args:
                 - ARGS_MySQLHost=${MySQLHost}
                 - ARGS_MySQLRoot=${MySQLRoot}
+                - ARGS_ProjectName=${ProjectName}
                 - ARGS_MySQLRootPassword=${MySQLRootPassword}
                 - ARGS_MySQLUser=${MySQLUser}
                 - ARGS_MySQLUserPassword=${MySQLUserPassword}
                 - ARGS_LorisFrontendUser=${LorisFrontendUser}
                 - ARGS_LorisFrontendPassword=${LorisFrontendPassword}
                 - ARGS_Ext_Port_HTTP=${Ext_Port_HTTP}
-                - ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
-                - ARGS_ProjectName=${ProjectName}
-                - ARGS_MySQLDatabase=LORIS # the database created by default is called LORIS
+                - ARGS_Ext_URL=${Ext_URL}
+                #- ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
+                - ARGS_MySQLDatabase=${MySQLDatabase} # the database created by default is called LORIS
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
         # Where to push eventually.
         image: neonatalbrainplatform/lorisdbsetup:${LORIS_version}-MRI
-
-        stdin_open: true
-        tty: true
-        ports:
-          - "5900-5999:5900"
         depends_on: # all these need to be up and running before running the Selenium integrator.
           - lorismri
           - lorismridb

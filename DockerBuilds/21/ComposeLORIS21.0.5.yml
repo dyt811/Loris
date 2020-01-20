@@ -1,7 +1,7 @@
 version: '3.7'
 # This is the Docker-Compose orchestration of LORIS WITHOUT MRI component pre-configured (i.e. base image)
 # This version does rely on the image from DockerHub and is a LOCAL BUILD
-# Last updated: 2019-01-13 12:15
+# Last updated: 2019-01-20 17:12
 # Maintainer: Yang Ding (it@cnbp.ca)
 
 services:
@@ -23,6 +23,8 @@ services:
              - backend
         ports:
             - "${Ext_Port_MySQL}:3306"
+        expose:
+          - 3306
 
         # Container name and label
         #container_name: LORIS_MySQLDB_${tag}
