@@ -9,12 +9,8 @@ services:
     # This is the database behind the LORIS 21 instance: note all data are stored in the dockerfile
     # DO NOT CHANGE THE service names as some of them are hard coded to dependent on each other.
     lorismridb:
-         # Container name and label
-        #container_name: LORIS_MySQLDB_${tag}
 
         # Building instructions.
-        #volumes:
-        #    - //c/git/data:/var/lib/mysql
         build:
             context: ../..
             # Still using the same shared Dockerfile from the base LORIS image.
@@ -36,6 +32,8 @@ services:
         logging:
             driver: "none"
 
+        volumes:
+            - lorismridbvolume:/var/lib/mysql
 
     # The loris frontned is HARDCODED to be recognized in subroutines as "loris" DO NOT CHANGE THIS NAME.
     # This is the docker image of running images
@@ -55,12 +53,18 @@ services:
                 - ARGS_MySQLDatabase=${MySQLDatabase}
                 #- ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
 
+        # Where to push eventually.
         image: neonatalbrainplatform/loris:${LORIS_version}-MRI
 
         networks:
             - backend
+
         depends_on:
             - lorismridb
+
+        volumes:
+            - lorismrivolume:/var/www
+
         ports:
             - "${Ext_Port_HTTP}:80"
             - "${Ext_Port_HTTPS}:443"
@@ -69,17 +73,17 @@ services:
     chrome:
         image: selenium/node-chrome-debug:3.14.0-gallium
         volumes:
-          - /dev/shm:/dev/shm
+            - /dev/shm:/dev/shm
         depends_on:
-          - hub
-          - lorismri
-          - lorismridb
+            - hub
+            - lorismri
+            - lorismridb
         environment:
-          HUB_HOST: hub
-          HUB_PORT: 4444
+            HUB_HOST: hub
+            HUB_PORT: 4444
         entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME" /opt/bin/entry_point.sh'
         networks:
-          - backend
+            - backend
 
     # The hub is HARDCODED to be recognized in subroutines as "hub" DO NOT CHANGE THIS NAME.
     hub:
@@ -93,7 +97,7 @@ services:
             - backend
 
     lorismridbsetup:
-        #container_name: DC_LORIS21Configurator_${tag}
+
         build:
             context: ../..
             dockerfile: DockerBuilds/21-MRI/Dockerfile.LORISMRI${LORIS_version}.dbsetup
@@ -120,11 +124,26 @@ services:
           - chrome
         networks:
             - backend
+volumes:
+    # This is where we specify the persistent volume reside and the name which they share under
+    lorismridbvolume:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ${folder_MySQL}
+    # This is where we specify the persistent volume reside and the name which they share under
+    lorismrivolume:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ${folder_www}
 
 # Networks allow connection with EXTERNAL containers and PROJECTS
 networks:
-  backend:
-    driver: "bridge"
+    backend:
+        driver: "bridge"
 
 # To run:
 # docker-compose -f ComposeLORIS21.0.5.yml --force

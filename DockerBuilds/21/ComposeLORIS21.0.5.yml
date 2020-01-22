@@ -10,8 +10,6 @@ services:
     lorisdb:
 
         # Building instructions.
-        #volumes:
-        #    - //c/git/data:/var/lib/mysql
         build:
             context: ../..
             dockerfile:  DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.db
@@ -20,11 +18,12 @@ services:
                 - ARGS_MYSQL_ROOT_PASSWORD=${MySQLRootPassword}
             # Environment not specified as the DockerFile is suppose to be standalone and workable too .
         networks:
-             - backend
+            - backend
+
         ports:
             - "${Ext_Port_MySQL}:3306"
         expose:
-          - 3306
+            - 3306
 
         # Container name and label
         #container_name: LORIS_MySQLDB_${tag}
@@ -34,6 +33,8 @@ services:
         logging:
             driver: "none"
 
+        volumes:
+            - lorisdbvolume:/var/lib/mysql
 
     # The loris frontned is HARDCODED to be recognized in subroutines as "loris" DO NOT CHANGE THIS NAME.
     loris:
@@ -57,27 +58,33 @@ services:
 
         networks:
             - backend
+
         depends_on:
             - lorisdb
+
+        volumes:
+            - lorisvolume:/var/www
+
         ports:
             - "${Ext_Port_HTTP}:80"
             - "${Ext_Port_HTTPS}:443"
 
-     # This is the selenium image (i.e. worker node) that will run the actual work process which is executed to setup the bridge connection between the database and the front end user interaction
+
+        # This is the selenium image (i.e. worker node) that will run the actual work process which is executed to setup the bridge connection between the database and the front end user interaction
     chrome:
         image: selenium/node-chrome-debug:3.14.0-gallium
         volumes:
-          - /dev/shm:/dev/shm
+            - /dev/shm:/dev/shm
         depends_on:
-          - hub
-          - loris
-          - lorisdb
+            - hub
+            - loris
+            - lorisdb
         environment:
-          HUB_HOST: hub
-          HUB_PORT: 4444
+            HUB_HOST: hub
+            HUB_PORT: 4444
         entrypoint: bash -c 'SE_OPTS="-host $$HOSTNAME" /opt/bin/entry_point.sh'
         networks:
-          - backend
+            - backend
 
     # The hub is HARDCODED to be recognized in subroutines as "hub" DO NOT CHANGE THIS NAME.
     hub:
@@ -111,17 +118,32 @@ services:
         # Where to push eventually.
         image: neonatalbrainplatform/lorisdbsetup:${LORIS_version}
         depends_on: # all these need to be up and running before running the Selenium integrator.
-          - loris
-          - lorisdb
-          - hub
-          - chrome
+            - loris
+            - lorisdb
+            - hub
+            - chrome
         networks:
             - backend
+volumes:
+    # This is where we specify the persistent volume reside and the name which they share under
+    lorisdbvolume:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ${folder_MySQL}
+    # This is where we specify the persistent volume reside and the name which they share under
+    lorisvolume:
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ${folder_www}
 
 # Networks allow connection with EXTERNAL containers and PROJECTS
 networks:
-  backend:
-    driver: "bridge"
+    backend:
+        driver: "bridge"
 
 # To run:
 # docker-compose -f ComposeLORIS21.0.5.yml --force
