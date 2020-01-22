@@ -64,7 +64,7 @@ RUN mkdir -m 2770 -p /data/incoming
 RUN mkdir -m 2770 -p /data/${ARGS_ProjectName}/data/
 # Source: https://stackoverflow.com/questions/30359334/creating-multiple-directories-using-docker-run
 # must not have space.
-RUN mkdir -m 770 -p /data/${ARGS_ProjectName}/{trashbin,tarchive,pic,logs,assembly,batch_output,bids_imports}
+RUN /bin/bash -c "mkdir -m 770 -p /data/${ARGS_ProjectName}/{trashbin,tarchive,pic,logs,assembly,batch_output,bids_imports}"
 
 #holds mincs that didn't match protocol
 #holds tared dicom-folder

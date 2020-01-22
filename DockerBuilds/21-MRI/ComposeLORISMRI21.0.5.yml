@@ -64,6 +64,7 @@ services:
 
         volumes:
             - lorismrivolume:/var/www
+            - lorisdatavolume:/data
 
         ports:
             - "${Ext_Port_HTTP}:80"
@@ -125,23 +126,32 @@ services:
         networks:
             - backend
 volumes:
-    # This is where we specify the persistent volume reside and the name which they share under
     lorismridbvolume:
+        # This is where we specify the persistent volume reside and the name which they share under
         driver: local
         driver_opts:
             type: none
             o: bind
             device: ${folder_MySQL}
-    # This is where we specify the persistent volume reside and the name which they share under
+
     lorismrivolume:
+        # This is where we specify the persistent volume reside and the name which they share under
         driver: local
         driver_opts:
             type: none
             o: bind
             device: ${folder_www}
 
-# Networks allow connection with EXTERNAL containers and PROJECTS
+    lorisdatavolume:
+        # This is where the imaging data will persist.
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ${folder_data}
+
 networks:
+    # Networks allow connection with EXTERNAL containers and PROJECTS
     backend:
         driver: "bridge"
 
