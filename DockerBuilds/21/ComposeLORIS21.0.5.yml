@@ -47,11 +47,6 @@ services:
             dockerfile: DockerBuilds/21/Dockerfile.LORIS${LORIS_version}.Ubuntu18
             args:
                 - ARGS_ProjectName=${ProjectName}
-                - ARGS_MySQLHost=${MySQLHost}
-                - ARGS_MySQLUser=${MySQLUser}
-                - ARGS_MySQLUserPassword=${MySQLUserPassword}
-                - ARGS_MySQLDatabase=${MySQLDatabase}
-                #- ARGS_LorisMaintenanceEmail=${LorisMaintenanceEmail}
 
         # Where to push eventually.
         image: neonatalbrainplatform/loris:${LORIS_version}

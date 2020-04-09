@@ -10,13 +10,23 @@ LABEL description="This image couple the frontend of LORIS with a backend MySQL 
 ##########################
 # Step 1. Create directories and download Loris-MRI code
 USER root
+
+
+ARG ARGS_MySQLDatabase=PlaceHolderDatabase
+ARG ARGS_MySQLUser=PlaceHolderUser
+ARG ARGS_MySQLUserPassword=PlaceHolderUserPassword
+ARG ARGS_MySQLHost=PlaceHolderHost
+ARG ARGS_ProjectName=DefaultProjectName
+
+
 # Create the /bin/mri folder .
 WORKDIR /data/${ARGS_ProjectName}/bin
 
 # Ensure permissions of the data folder is under lorisadmin.
 #RUN chown -R lorisadmin:lorisadmin /data/$ARGS_ProjectName
-ADD https://github.com/aces/Loris-MRI/archive/v21.0.5.zip /data/${ARGS_ProjectName}/bin/
+ADD https://github.com/aces/Loris-MRI/archive/v21.0.5.zip .
 RUN unzip v21.0.5.zip
+RUN rm v21.0.5.zip
 RUN mv Loris-MRI-21.0.5 mri
 
 RUN chown -R lorisadmin:lorisadmin /data
